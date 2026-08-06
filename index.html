@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>招商银行深圳市外币兑换地图信息表</title>
+  <style>
+    html,body { height:100%; margin:0; font-family:"楷体","KaiTi",serif; background:#ffffff; color:#222; font-size:16px; -webkit-font-smoothing:antialiased; }
+    .app { display:flex; flex-direction:column; height:100vh; }
+    header { padding:12px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee; background:#fff; position:sticky; top:0; z-index:10; }
+    .back-btn { background:transparent; border:1px solid #FF6A00; color:#FF6A00; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:14px; display:none; }
+    header h1 { margin:0; font-size:20px; font-family:"楷体"; color:#333; flex:1; text-align:center; }
+    header p { margin:0; color:#666; font-size:12px; display:none; }
+    main { flex:1; overflow:auto; padding:16px; box-sizing:border-box; min-height:0; }
+    .container { max-width:1100px; margin:0 auto; }
+    .section-title { font-size:18px; margin:8px 0 12px 0; color:#333; font-family:"楷体"; }
+    .currency-grid { display:flex; flex-direction:column; gap:12px; }
+    .btn { background:#FF6A00; color:#fff; border:none; padding:12px 16px; border-radius:6px; font-size:16px; cursor:pointer; text-align:left; transition:transform .18s ease, box-shadow .18s; font-family:"楷体"; }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(255,106,0,0.18); }
+    .list { display:flex; flex-direction:column; gap:8px; }
+    .branch-item { display:flex; justify-content:space-between; align-items:center; gap:8px; background:#fff; border:1px solid #f0f0f0; padding:12px; border-radius:6px; }
+    .branch-name { font-size:16px; color:#333; font-family:"楷体"; word-break:break-word; }
+    .actions { display:flex; gap:8px; }
+    .action-btn { background:#FF6A00; color:#fff; border:none; padding:8px 10px; border-radius:6px; cursor:pointer; font-size:14px; }
+    .detail { border:1px solid #eee; padding:16px; border-radius:6px; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.04); }
+    .detail h2 { margin:0 0 8px 0; font-size:20px; font-family:"楷体"; }
+    .meta { margin:8px 0; line-height:1.7; font-size:16px; }
+    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+    .copy-btn { background:#f5f5f5; border:1px solid #ddd; padding:8px 10px; border-radius:4px; cursor:pointer; font-size:14px; }
+    .nav-btn { background:#FF6A00; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:14px; }
+    .source { margin-top:10px; color:#666; font-size:13px; }
+    .note { margin-top:8px; color:#888; font-size:14px; }
+    .hidden { display:none; }
+    @media (max-width:900px){
+      header h1 { text-align:left; font-size:18px; }
+      .back-btn { display:inline-block; }
+      header p { display:block; font-size:12px; text-align:right; }
+      .container { padding:0 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <button id="backBtn" class="back-btn">返回</button>
+      <h1>招商银行深圳市外币兑换地图信息表</h1>
+      <p id="headerSub" class="hidden">币种选择</p>
+    </header>
+
+    <main>
+      <div class="container" id="viewRoot">
+        <!-- 路由渲染点 -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 数据（同前，已核验条目尽量填写，部分为参考/待进一步确认）
+    const data = {
+      currencies: [
+        { id: "hk_us_eur_jpy", name: "港币 / 美元 / 欧元 / 日元", note: "深圳分行所有网点均可办理" },
+        { id: "aud_gbp", name: "澳大利亚元 / 英镑", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","水榭花都支行","滨河时代支行","深纺大厦支行","皇岗支行","中央商务支行","泰然支行","华侨城支行","南山科创支行","前海分行营业部","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "cad", name: "加拿大元", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","泰然支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "sgd", name: "新加坡元（新元）", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","泰然支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "chf", name: "瑞士法郎", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行"] },
+        { id: "nzd", name: "新西兰元（纽元）", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深湾中心支行"] }
+      ],
+      branchDetails: {
+        "罗湖支行": { address: "罗湖区人民南路3005号深房广场1楼（国贸地铁站B口步行约100米）", phone: "0755-82184978", hours: "周一至周五 09:00-17:00；周六 09:00-16:00（以网点公告为准）", lat:22.540931, lng:114.118257, source:"招商银行官网 / 高德地图" },
+        "深圳分行营业部": { address: "福田区深南大道2016号招商银行深圳分行大厦", phone: "0755-83198888 / 0755-83195289", hours: "周一至周五 09:00-17:00（部分自助区24小时）", lat:22.541246, lng:114.029794, source:"招商银行官网 / 高德地图" },
+        "蛇口支行": { address: "南山区蛇口招商路招商大厦首层", phone: "0755-21605391 / 0755-21625535", hours: "周一至周五 09:00-17:00（以网点为准）", lat:22.48685, lng:113.91953, source:"高德地图 / 本地站点" },
+        "建安支行": { address: "宝安区宝安六区建安一路74号", phone: "0755-27881000", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.561519, lng:113.883993, source:"本地站点 / 高德" },
+        "水榭花都支行": { address: "香梅路香蜜湖水榭花都（三期）商业区", phone: "0755-82733601", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.550200, lng:114.033657, source:"企查查 / 高德" },
+        "滨河时代支行": { address: "福田区滨河大道KKONE一楼北入口侧（下沙站附近）", phone: "0755-83442064", hours: "周一至周五 09:00-17:00；周六 09:00-16:00（以网点公告为准）", lat:22.53382, lng:114.03690, source:"本地站点 / 高德" },
+        "深纺大厦支行": { address: "福田区华强北路3号深纺大厦AB座首层", phone: "0755-83754837", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.542403, lng:114.088796, source:"本地站点 / 高德" },
+        "皇岗支行": { address: "福田区彩田南路中深花园B座首层", phone: "0755-82995986", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.52390, lng:114.05240, source:"深圳分行公告 / 高德" },
+        "中央商务支行": { address: "福田区福华一路88号中心商务大厦1楼", phone: "0755-82032768 / 0755-82032908", hours: "周一至周五 09:00-17:00；周六 09:00-16:00", lat:22.531347, lng:114.052818, source:"本地站点 / 高德" },
+        "泰然支行": { address: "福田区泰然九路海松大厦首层（泰然金谷支行）", phone: "0755-82044296（参考，请以网点为准）", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.542258, lng:114.034898, source:"招商银行公告 / 本地资料" },
+        "华侨城支行": { address: "南山区华侨城东方花园综合楼/服务楼首层", phone: "0755-26609248 / 0755-26904277", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.5401, lng:113.9828, source:"本地站点 / 高德" },
+        "南山科创支行": { address: "南山区海岸城/科创园区周边（以网点公告与高德为准）", phone: "招商银行官网/95555 查询", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.51458, lng:113.93499, source:"本地/高德参考" },
+        "前海分行营业部": { address: "前海卓越金融中心/前海片区办公楼（以导航为准）", phone: "0755-86939083 / 0755-86939086", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.526655, lng:113.907235, source:"本地站点 / 企查查" },
+        "盐田支行": { address: "盐田区沙头角官吓路69号瀚海东岸首层", phone: "0755-25558801", hours: "周一至周五 09:00-17:00；周末 09:00-16:00（请电话确认）", lat:22.536, lng:114.241, source:"本地站点 / 高德" },
+        "布吉支行": { address: "龙岗区百鸽路270号（参考）", phone: "0755-28579345", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.6297, lng:114.1116, source:"本地站点 / 高德" },
+        "深湾中心支行": { address: "南山区深湾二路/深湾中心（总部地块南侧，参照公告）", phone: "0755-83195306（参考）", hours: "请以网点公告/电话为准", lat:22.521, lng:113.943, source:"企查查 / 招商银行公告" },
+        "波托菲诺支行": { address: "南山区华侨城纯水岸综合市场101B（参考）", phone: "0755-26609547", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.540, lng:113.985, source:"企查查 / 高德" },
+        "高新园科创支行": { address: "南山区高新南七路16号德维森大厦1层（高新园科创区）", phone: "0755-86187681", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.534143, lng:113.946611, source:"高德 / 企查查" },
+        "龙华支行": { address: "龙华区人民路4022号壹方天地A区L1-023（参考）", phone: "0755-28102130", hours: "周一至周五 09:00-17:00；周六 09:00-16:00（请电话确认）", lat:22.648108, lng:114.027937, source:"高德 / 本地站点" },
+        "新时代支行": { address: "蛇口太子路1号新时代广场首层（参考）", phone: "0755-26673212", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.495, lng:113.925, source:"本地站点 / 高德" },
+        "上步支行": { address: "深南大道1002号新闻大厦首层（参考）", phone: "0755-82095606", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.541, lng:114.056, source:"爱企查 / 本地站点" },
+        "金丰城支行": { address: "深南东路5015号金丰城大厦B座一楼（参考）", phone: "0755-82070257", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.541978, lng:114.118272, source:"本地站点 / 高德" },
+        "福强支行": { address: "福田区金田南路御庭苑首层（参考）", phone: "0755-83431251", hours: "周一至周五 09:00-17:00（请电话确认）", lat:22.52227, lng:114.05572, source:"企查查 / 本地资料" }
+      }
+    };
+
+    // DOM
+    const root = document.getElementById('viewRoot');
+    const backBtn = document.getElementById('backBtn');
+    const headerSub = document.getElementById('headerSub');
+
+    // 路由
+    function router() {
+      const hash = location.hash || '#/';
+      // format: #/ , #/currency/:id, #/branch/:name
+      const parts = hash.slice(2).split('/');
+      const route = parts[0] || '';
+      if (!route) {
+        renderHome();
+        showBack(false);
+      } else if (route === 'currency') {
+        const id = parts[1];
+        renderCurrency(id);
+        showBack(true, '#/');
+      } else if (route === 'branch') {
+        const name = decodeURIComponent(parts.slice(1).join('/'));
+        renderBranch(name);
+        showBack(true, '#/'); // back returns to previous; keeps simple
+      } else {
+        renderHome();
+        showBack(false);
+      }
+    }
+
+    window.addEventListener('hashchange', router);
+    window.addEventListener('load', router);
+
+    backBtn.addEventListener('click', () => {
+      // 尝试后退，否则跳到首页
+      if (history.length > 1) history.back();
+      else location.hash = '#/';
+    });
+
+    function showBack(visible, text='#/') {
+      if (visible) {
+        backBtn.style.display = 'inline-block';
+      } else {
+        backBtn.style.display = 'none';
+      }
+    }
+
+    // 渲染函数
+    function renderHome() {
+      headerSub.textContent = '';
+      root.innerHTML = `
+        <div>
+          <div class="section-title">币种选择</div>
+          <div class="currency-grid" id="currencyGrid"></div>
+        </div>
+      `;
+      const grid = document.getElementById('currencyGrid');
+      data.currencies.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = c.name;
+        btn.onclick = () => { location.hash = '#/currency/' + encodeURIComponent(c.id); };
+        grid.appendChild(btn);
+      });
+      document.title = '招商银行深圳市外币兑换地图信息表';
+    }
+
+    function renderCurrency(id) {
+      const cur = data.currencies.find(x => x.id === id);
+      headerSub.textContent = cur ? cur.name : '';
+      if (!cur) {
+        root.innerHTML = '<div class="section-title">未找到币种</div>';
+        return;
+      }
+      if (cur.note) {
+        root.innerHTML = `
+          <div>
+            <div class="section-title">${cur.name}</div>
+            <div class="detail"><div class="meta">${cur.note}</div></div>
+          </div>
+        `;
+      } else {
+        root.innerHTML = `
+          <div>
+            <div class="section-title">${cur.name} — 可办理网点</div>
+            <div class="list" id="branchList"></div>
+          </div>
+        `;
+        const listEl = document.getElementById('branchList');
+        cur.branches.forEach(name => {
+          const item = document.createElement('div');
+          item.className = 'branch-item';
+          const span = document.createElement('div');
+          span.className = 'branch-name';
+          span.textContent = name;
+          item.appendChild(span);
+
+          const actions = document.createElement('div');
+          actions.className = 'actions';
+          const viewBtn = document.createElement('button');
+          viewBtn.className = 'action-btn';
+          viewBtn.textContent = '查看详情';
+          viewBtn.onclick = () => { location.hash = '#/branch/' + encodeURIComponent(name); };
+          actions.appendChild(viewBtn);
+          item.appendChild(actions);
+          listEl.appendChild(item);
+        });
+      }
+      document.title = `招商银行 - ${cur.name}`;
+    }
+
+    function renderBranch(name) {
+      headerSub.textContent = name;
+      const info = data.branchDetails[name];
+      let html = `<div class="section-title">${name}</div>`;
+      if (!info || !info.address) {
+        html += `<div class="detail"><div class="meta"><div><strong>地址：</strong>待核验</div><div><strong>联系方式：</strong>待核验</div><div><strong>营业时间：</strong>待核验</div></div><div class="note">该网点信息尚未完全核验或官网未列出完整条目；后续会继续核验并更新。</div></div>`;
+        root.innerHTML = html;
+        document.title = `招商银行 - ${name}`;
+        return;
+      }
+      html += `
+        <div class="detail">
+          <h2>${name}</h2>
+          <div class="meta">
+            <div><strong>地址：</strong><span id="addrText">${info.address}</span></div>
+            <div><strong>联系方式：</strong>${info.phone || '请致电95555或官网查询'}</div>
+            <div><strong>营业时间：</strong>${info.hours || '请致电或官网确认'}</div>
+            <div class="source"><strong>主要来源：</strong>${info.source || '招商银行官网 / 高德地图'}</div>
+          </div>
+          <div class="row">
+            <button id="copyBtn" class="copy-btn">复制地址</button>
+            <button id="navBtn" class="nav-btn">高德导航</button>
+          </div>
+          ${ (info.lat!=null && info.lng!=null) ? `<div style="margin-top:8px;color:#666;font-size:13px;">经纬度：${info.lng}, ${info.lat}</div>` : '' }
+          <div class="note">高德导航在移动端会尝试唤起高德 App；桌面端会打开高德网页版。若需包含导航模式或起点，请授权定位或告知我调整。</div>
+        </div>
+      `;
+      root.innerHTML = html;
+      // 绑定按钮
+      const copyBtn = document.getElementById('copyBtn');
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(info.address);
+          copyBtn.textContent = '已复制 ✓';
+          setTimeout(()=> copyBtn.textContent = '复制地址',1500);
+        } catch(e) {
+          alert('复制失败：' + e);
+        }
+      });
+      const navBtn = document.getElementById('navBtn');
+      navBtn.addEventListener('click', () => {
+        if (info.lng != null && info.lat != null) {
+          const pos = info.lng + ',' + info.lat;
+          const title = encodeURIComponent(name);
+          const uri = `https://uri.amap.com/marker?position=${pos}&name=${title}&coordinate=gaode&callnative=1`;
+          window.open(uri, '_blank');
+        } else {
+          const encodedAddr = encodeURIComponent(info.address || name);
+          const uri = `https://uri.amap.com/search?query=${encodedAddr}&callnative=1`;
+          window.open(uri, '_blank');
+        }
+      });
+      document.title = `招商银行 - ${name}`;
+    }
+
+    // 如果想默认打开某个币种或分支，可在加载时设置 location.hash = '#/currency/aud_gbp' 等
+  </script>
+</body>
+</html>
