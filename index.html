@@ -26,8 +26,10 @@
     .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:8px; }
     .copy-btn { background:#f5f5f5; border:1px solid #ddd; padding:8px 10px; border-radius:4px; cursor:pointer; font-size:14px; }
     .nav-btn { background:#FF6A00; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:14px; }
+    .checkStatusBtn { background:#FF8A33; border:none; color:#fff;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:14px; }
     .source { margin-top:10px; color:#666; font-size:13px; }
     .note { margin-top:8px; color:#888; font-size:14px; }
+    .statusBox { margin-top:8px;color:#888;font-size:14px; }
     .hidden { display:none; }
     @media (max-width:900px){
       header h1 { text-align:left; font-size:18px; }
@@ -188,122 +190,129 @@
       root.appendChild(wrapper);
     }
 
+    let renderCurrencyRunning = false;
     // Render currency page: fetch branches, compute distances, sort, display
     async function renderCurrency(id) {
-      const cur = data.currencies.find(x => x.id === id);
-      if (!cur) {
-        root.innerHTML = '<div class="section-title">未找到该币种</div>';
-        return;
-      }
-      document.title = `招商银行 - ${cur.name}`;
-      root.innerHTML = `<div class="section-title">${escapeHtml(cur.name)}</div>`;
-
-      if (cur.note) {
-        root.innerHTML += `<div class="detail"><div class="meta">${escapeHtml(cur.note)}</div></div>`;
-        return;
-      }
-
-      // fetch branches list
-      let branchesData;
-      try {
-        const r = await fetch('/api/branches');
-        const j = await r.json();
-        if (!j.ok) throw new Error('branches api error');
-        branchesData = j.branches;
-      } catch (e) {
-        console.error('fetch branches failed', e);
-        root.innerHTML += '<div class="note">无法获取网点数据，请稍后重试。</div>';
-        return;
-      }
-
-      // normalize name helper: remove zero-width / nbsp, collapse spaces, trim, lower
-      const norm = s => s ? String(s).replace(/[\u200B\uFEFF\u00A0]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase() : '';
-
-      // dedupe target names (normalize) and find matching branches by normalized name
-      const targetNames = Array.from(new Set((cur.branches || []).map(n => norm(n))));
-      let items = (branchesData || []).filter(b => targetNames.includes(norm(b.name)));
-  
-      // remove duplicates by normalized name, keep first occurrence
-      const seen = new Set();
-      items = items.filter(b => {
-        const k = norm(b.name);
-        if (seen.has(k)) return false;
-        seen.add(k);
-        return true;
-      });
-
-      // get user location (timeout)
-      let userPos = null;
-      function getPositionPromise(timeout = 8000) {
-        return new Promise((resolve) => {
-          if (!navigator.geolocation) return resolve(null);
-          let resolved = false;
-          const timer = setTimeout(() => { if (!resolved) { resolved = true; resolve(null); } }, timeout);
-          navigator.geolocation.getCurrentPosition(pos => {
-            if (resolved) return;
-            resolved = true; clearTimeout(timer);
-            resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-          }, err => {
-            if (resolved) return;
-            resolved = true; clearTimeout(timer);
-            resolve(null);
-          }, { enableHighAccuracy: true, maximumAge: 60000, timeout: timeout });
-        });
-      }
-
-      userPos = await getPositionPromise(8000);
-
-      // Haversine
-      function haversine(lat1, lon1, lat2, lon2) {
-        const toRad = x => x * Math.PI / 180;
-        const R = 6371000;
-        const dLat = toRad(lat2 - lat1);
-        const dLon = toRad(lon2 - lon1);
-        const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-      }
-
-      items = items.map(b => {
-        if (userPos && isFinite(b.lat) && isFinite(b.lng)) {
-          const d = Math.round(haversine(userPos.lat, userPos.lng, b.lat, b.lng));
-          b._distance_m = d;
-          b._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
-        } else {
-          b._distance_m = null;
-          b._distance_text = '未知';
+      if(renderCurrencyRunning) return;
+      renderCurrencyRunning = true;
+      try{
+        const cur = data.currencies.find(x => x.id === id);
+        if (!cur) {
+          root.innerHTML = '<div class="section-title">未找到该币种</div>';
+          return;
         }
-        return b;
-      });
+        document.title = `招商银行 - ${cur.name}`;
+        root.innerHTML = `<div class="section-title">${escapeHtml(cur.name)}</div>`;
 
-      items.sort((a,b) => {
-        if (a._distance_m == null && b._distance_m == null) return 0;
-        if (a._distance_m == null) return 1;
-        if (b._distance_m == null) return -1;
-        return a._distance_m - b._distance_m;
-      });
+        if (cur.note) {
+          root.innerHTML += `<div class="detail"><div class="meta">${escapeHtml(cur.note)}</div></div>`;
+          return;
+        }
 
-      const listEl = document.createElement('div');
-      listEl.className = 'list';
-      items.forEach(b => {
-        const item = document.createElement('div');
-        item.className = 'branch-item';
-        const left = document.createElement('div'); left.style.flex = '1';
-        left.innerHTML = `<div class="branch-name">${escapeHtml(b.name)}</div><div style="color:#666;font-size:14px;margin-top:6px">${escapeHtml(b.address)}</div>`;
-        const right = document.createElement('div'); right.style.display='flex'; right.style.flexDirection='column'; right.style.alignItems='flex-end';
-        right.innerHTML = `<div style="font-size:14px;color:#333;font-weight:600">${escapeHtml(b._distance_text)}</div>
-                           <div style="margin-top:8px;"><button class="action-btn" data-name="${encodeURIComponent(b.name)}">查看详情</button></div>`;
-        item.appendChild(left); item.appendChild(right); listEl.appendChild(item);
-      });
+        // fetch branches list
+        let branchesData;
+        try {
+          const r = await fetch('/api/branches');
+          const j = await r.json();
+          if (!j.ok) throw new Error('branches api error');
+          branchesData = j.branches;
+        } catch (e) {
+          console.error('fetch branches failed', e);
+          root.innerHTML += '<div class="note">无法获取网点数据，请稍后重试。</div>';
+          return;
+        }
 
-      root.appendChild(listEl);
+        // normalize name helper: remove zero-width / nbsp, collapse spaces, trim, lower
+        const norm = s => s ? String(s).replace(/[\u200B\uFEFF\u00A0]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase() : '';
 
-      listEl.addEventListener('click', (ev) => {
-        const btn = ev.target.closest('button.action-btn');
-        if (!btn) return;
-        const name = decodeURIComponent(btn.getAttribute('data-name'));
-        location.hash = '#/branch/' + encodeURIComponent(name);
-      });
+        // dedupe target names (normalize) and find matching branches by normalized name
+        const targetNames = Array.from(new Set((cur.branches || []).map(n => norm(n))));
+        let items = (branchesData || []).filter(b => targetNames.includes(norm(b.name)));
+    
+        // remove duplicates by normalized name, keep first occurrence
+        const seen = new Set();
+        items = items.filter(b => {
+          const k = norm(b.name);
+          if (seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        });
+
+        // get user location (timeout)
+        let userPos = null;
+        function getPositionPromise(timeout = 8000) {
+          return new Promise((resolve) => {
+            if (!navigator.geolocation) return resolve(null);
+            let resolved = false;
+            const timer = setTimeout(() => { if (!resolved) { resolved = true; resolve(null); } }, timeout);
+            navigator.geolocation.getCurrentPosition(pos => {
+              if (resolved) return;
+              resolved = true; clearTimeout(timer);
+              resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            }, err => {
+              if (resolved) return;
+              resolved = true; clearTimeout(timer);
+              resolve(null);
+            }, { enableHighAccuracy: true, maximumAge: 60000, timeout: timeout });
+          });
+        }
+
+        userPos = await getPositionPromise(8000);
+
+        // Haversine
+        function haversine(lat1, lon1, lat2, lon2) {
+          const toRad = x => x * Math.PI / 180;
+          const R = 6371000;
+          const dLat = toRad(lat2 - lat1);
+          const dLon = toRad(lon2 - lon1);
+          const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          return R * c;
+        }
+
+        items = items.map(b => {
+          if (userPos && isFinite(b.lat) && isFinite(b.lng)) {
+            const d = Math.round(haversine(userPos.lat, userPos.lng, b.lat, b.lng));
+            b._distance_m = d;
+            b._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
+          } else {
+            b._distance_m = null;
+            b._distance_text = '未知';
+          }
+          return b;
+        });
+
+        items.sort((a,b) => {
+          if (a._distance_m == null && b._distance_m == null) return 0;
+          if (a._distance_m == null) return 1;
+          if (b._distance_m == null) return -1;
+          return a._distance_m - b._distance_m;
+        });
+
+        const listEl = document.createElement('div');
+        listEl.className = 'list';
+        items.forEach(b => {
+          const item = document.createElement('div');
+          item.className = 'branch-item';
+          const left = document.createElement('div'); left.style.flex = '1';
+          left.innerHTML = `<div class="branch-name">${escapeHtml(b.name)}</div><div style="color:#666;font-size:14px;margin-top:6px">${escapeHtml(b.address)}</div>`;
+          const right = document.createElement('div'); right.style.display='flex'; right.style.flexDirection='column'; right.style.alignItems='flex-end';
+          right.innerHTML = `<div style="font-size:14px;color:#333;font-weight:600">${escapeHtml(b._distance_text)}</div>
+                             <div style="margin-top:8px;"><button class="action-btn" data-name="${encodeURIComponent(b.name)}">查看详情</button></div>`;
+          item.appendChild(left); item.appendChild(right); listEl.appendChild(item);
+        });
+
+        root.appendChild(listEl);
+
+        listEl.addEventListener('click', (ev) => {
+          const btn = ev.target.closest('button.action-btn');
+          if (!btn) return;
+          const name = decodeURIComponent(btn.getAttribute('data-name'));
+          location.hash = '#/branch/' + encodeURIComponent(name);
+        });
+      }finally{
+        renderCurrencyRunning = false;
+      }
     }
 
     // branch detail: use branches.json (via /api/branches) and call /api/status for open/closed
@@ -328,7 +337,10 @@
         return;
       }
 
-      const info = branchesData.find(b => b.name === name);
+      const norm = s => s ? String(s).replace(/[\u200B\uFEFF\u00A0]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase() : '';
+      const targetNormName = norm(name);
+      const info = branchesData.find(b => norm(b.name) === targetNormName);
+
       if (!info) {
         wrapper.innerHTML += '<div class="detail"><div class="meta">该网点信息未找到。</div></div>';
         return;
@@ -339,33 +351,31 @@
       card.innerHTML = `
         <h2>${escapeHtml(info.name)}</h2>
         <div class="meta">
-          <div><strong>地址：</strong><span id="addrText">${escapeHtml(info.address)}</span></div>
+          <div><strong>地址：</strong><span>${escapeHtml(info.address)}</span></div>
           <div><strong>联系方式：</strong>${escapeHtml(info.phone || '请致电95555或官网查询')}</div>
           <div><strong>营业时间：</strong>${escapeHtml(formatHours(info.hours))}</div>
           <div class="source"><strong>主要来源：</strong>${escapeHtml((info.source||[]).map(s=>s.title).join(' / '))}</div>
         </div>
         <div class="row">
-          <button id="copyBtn" class="copy-btn">复制地址</button>
-          <button id="navBtn" class="nav-btn">高德导航</button>
-          <button id="checkStatusBtn" class="btn" style="background:#FF8A33;padding:8px 10px;">查看营业状态</button>
+          <button class="copy-btn">复制地址</button>
+          <button class="nav-btn">高德导航</button>
+          <button class="checkStatusBtn">查看营业状态</button>
         </div>
         ${(info.lat!=null && info.lng!=null) ? `<div style="margin-top:8px;color:#666;font-size:13px;">经纬度：${info.lng}, ${info.lat}</div>` : ''}
-        <div id="statusBox" class="note"></div>
+        <div class="statusBox"></div>
       `;
       wrapper.appendChild(card);
 
-      // Attach handlers scoped to this card to avoid global id lookup issues
-      const copyBtn = card.querySelector('#copyBtn') || card.querySelector('.copy-btn');
+      // Attach handlers scoped to this card
+      const copyBtn = card.querySelector('.copy-btn');
       if (copyBtn) {
         copyBtn.addEventListener('click', async () => {
           try { await navigator.clipboard.writeText(info.address); copyBtn.textContent = '已复制 ✓'; setTimeout(()=>copyBtn.textContent='复制地址',1500); }
           catch(e){ alert('复制失败，请手动复制：' + info.address); }
         });
-      } else {
-        console.warn('copyBtn not found for branch', info && info.name);
       }
 
-      const navBtnEl = card.querySelector('#navBtn') || card.querySelector('.nav-btn');
+      const navBtnEl = card.querySelector('.nav-btn');
       if (navBtnEl) {
         navBtnEl.addEventListener('click', () => {
           if (info.lng != null && info.lat != null) {
@@ -378,12 +388,10 @@
             window.open(uri, '_blank');
           }
         });
-      } else {
-        console.warn('navBtn not found for branch', info && info.name);
       }
 
-      const statusBoxEl = card.querySelector('#statusBox') || card.querySelector('.note');
-      const checkStatusBtnEl = card.querySelector('#checkStatusBtn') || card.querySelector('.btn');
+      const statusBoxEl = card.querySelector('.statusBox');
+      const checkStatusBtnEl = card.querySelector('.checkStatusBtn');
       if (checkStatusBtnEl) {
         checkStatusBtnEl.addEventListener('click', async () => {
           if (statusBoxEl) statusBoxEl.textContent = '查询中...';
@@ -391,33 +399,17 @@
             const r = await fetch('/api/status?branch=' + encodeURIComponent(info.name));
             const j = await r.json();
             if (!j.ok) { if (statusBoxEl) statusBoxEl.textContent = '状态查询失败'; console.error(j); return; }
-            if (statusBoxEl) statusBoxEl.innerHTML = `<div>当前时间（Asia/Shanghai）：${j.now.weekday} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>\n                                 <div>营业状态：<strong style="color:${j.isOpen ? '#0a0' : '#a00'}">${j.isOpen ? '营业中' : '已关闭'}</strong></div>\n                                 <div>今日时段：${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : '无明确时段'}</div>`;
+            if (statusBoxEl) statusBoxEl.innerHTML = `<div>当前时间（Asia/Shanghai）：${j.now.weekday} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>
+                                 <div>营业状态：<strong style="color:${j.isOpen ? '#0a0' : '#a00'}">${j.isOpen ? '营业中' : '已关闭'}</strong></div>
+                                 <div>今日时段：${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : '无明确时段'}</div>`;
           } catch (e) {
             if (statusBoxEl) statusBoxEl.textContent = '状态查询发生错误';
             console.error(e);
           }
         });
-      } else {
-        console.warn('checkStatusBtn not found for branch', info && info.name);
       }
     }
 
-    // router
-    function routeHandler() { router(); }
-    window.addEventListener('hashchange', routeHandler);
-    window.addEventListener('load', routeHandler);
-
-    // initial router function wrapper for previous definitions
-    function router() {
-      try {
-        const parts = getHashParts();
-        if (parts.length === 0) { renderHome(); showBack(false); return; }
-        const route = parts[0];
-        if (route === 'currency') { const id = parts[1] ? decodeURIComponent(parts[1]) : ''; renderCurrency(id); showBack(true); }
-        else if (route === 'branch') { const encoded = parts.slice(1).join('/'); const name = encoded ? decodeURIComponent(encoded) : ''; renderBranch(name); showBack(true); }
-        else { renderHome(); showBack(false); }
-      } catch (err) { console.error('router error', err); showFatal(err.stack||err.message||err); renderHome(); showBack(false); }
-    }
   } catch (err) {
     console.error('Fatal error initializing app', err);
     try { showFatal(err.stack || err.message || err); } catch(e){}
