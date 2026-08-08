@@ -44,8 +44,14 @@ export async function onRequest(context) {
       const o = toMinutes(openPeriod.open), c = toMinutes(openPeriod.close);
       if (o != null && c != null) isOpen = currentHM >= o && currentHM <= c;
     } else {
-      const o = toMinutes('09:00'), c = toMinutes('17:00');
-      if (d !== 'sunday') isOpen = currentHM >= o && currentHM <= c;
+      // only apply default workday hours for Mon-Fri; weekends with no hours are treated as closed
+      const workdays = ['monday','tuesday','wednesday','thursday','friday'];
+      if (workdays.includes(d)) {
+        const o = toMinutes('09:00'), c = toMinutes('17:00');
+        isOpen = currentHM >= o && currentHM <= c;
+      } else {
+        isOpen = false;
+      }
     }
 
     return new Response(JSON.stringify({
