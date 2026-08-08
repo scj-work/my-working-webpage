@@ -216,10 +216,21 @@
         return;
       }
 
-      // dedupe target names and matched items to avoid duplicates
-      const targetNames = Array.from(new Set(cur.branches || []));
-      let items = branchesData.filter(b => targetNames.includes(b.name));
-      items = items.filter((v,i,a) => a.findIndex(x => x.name === v.name) === i);
+    // normalize name helper: remove zero-width / nbsp, collapse spaces, trim, lower
+    const norm = s => s ? String(s).replace(/[\u200B\uFEFF\u00A0]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase() : '';
+
+    // dedupe target names (normalize) and find matching branches by normalized name
+    const targetNames = Array.from(new Set((cur.branches || []).map(n => norm(n))));
+    let items = (branchesData || []).filter(b => targetNames.includes(norm(b.name)));
+
+    // remove duplicates by normalized name, keep first occurrence
+    const seen = new Set();
+    items = items.filter(b => {
+      const k = norm(b.name);
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
 
       // get user location (timeout)
       let userPos = null;
