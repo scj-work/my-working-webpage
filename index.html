@@ -1,404 +1,86 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>招商银行深圳市外币兑换地图信息表</title>
-  <style>
-    html,body { height:100%; margin:0; font-family:"楷体","KaiTi",serif; background:#ffffff; color:#222; font-size:16px; -webkit-font-smoothing:antialiased; }
-    .app { display:flex; flex-direction:column; height:100vh; }
-    header { padding:12px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee; background:#fff; position:sticky; top:0; z-index:10; }
-    .back-btn { background:transparent; border:1px solid #FF6A00; color:#FF6A00; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:14px; display:none; }
-    header h1 { margin:0; font-size:20px; font-family:"楷体"; color:#333; flex:1; text-align:center; }
-    main { flex:1; overflow:auto; padding:16px; box-sizing:border-box; min-height:0; }
-    .container { max-width:1100px; margin:0 auto; }
-    .section-title { font-size:18px; margin:8px 0 12px 0; color:#333; font-family:"楷体"; }
-    .btn { background:#FF6A00; color:#fff; border:none; padding:12px 16px; border-radius:6px; font-size:16px; cursor:pointer; text-align:left; transition:transform .18s ease, box-shadow .18s; font-family:"楷体"; }
-    .btn:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(255,106,0,0.18); }
-    .list { display:flex; flex-direction:column; gap:8px; }
-    .branch-item { display:flex; justify-content:space-between; align-items:center; gap:8px; background:#fff; border:1px solid #f0f0f0; padding:12px; border-radius:6px; }
-    .branch-name { font-size:16px; color:#333; font-family:"楷体"; word-break:break-word; }
-    .actions { display:flex; gap:8px; }
-    .action-btn { background:#FF6A00; color:#fff; border:none; padding:8px 10px; border-radius:6px; cursor:pointer; font-size:14px; }
-    .detail { border:1px solid #eee; padding:16px; border-radius:6px; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.04); }
-    .detail h2 { margin:0 0 8px 0; font-size:20px; font-family:"楷体"; }
-    .meta { margin:8px 0; line-height:1.7; font-size:16px; }
-    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:8px; }
-    .copy-btn { background:#f5f5f5; border:1px solid #ddd; padding:8px 10px; border-radius:4px; cursor:pointer; font-size:14px; }
-    .nav-btn { background:#FF6A00; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:14px; }
-    .source { margin-top:10px; color:#666; font-size:13px; }
-    .note { margin-top:8px; color:#888; font-size:14px; }
-    .hidden { display:none; }
-    @media (max-width:900px){
-      header h1 { text-align:left; font-size:18px; }
-      .back-btn { display:inline-block; }
-      .container { padding:0 8px; }
-    }
-  </style>
-</head>
-<body>
-  <script>
-    // Global error handlers so we can see why the app fails instead of blank screen
-    function showFatal(msg) {
-      try {
-        var box = document.getElementById('appErrorBox');
-        if (!box) {
-          box = document.createElement('div');
-          box.id = 'appErrorBox';
-          box.style = 'padding:20px;font-family:Arial,\'Helvetica Neue\',Helvetica,sans-serif;background:#fff0f0;color:#800;border:2px solid #f5c2c2;';
-          document.body.insertBefore(box, document.body.firstChild);
-        }
-        box.innerText = '应用加载错误：' + String(msg) + '\n(详见控制台)';
-      } catch (e) {
-        console.error('Failed to render error box', e);
-      }
-    }
-
-    window.addEventListener('error', function (e) {
-      console.error('Uncaught error', e.error || e.message || e);
-      showFatal(e.error ? (e.error.stack || e.error.message) : (e.message || String(e)));
-    });
-    window.addEventListener('unhandledrejection', function (e) {
-      console.error('Unhandled rejection', e.reason || e);
-      showFatal(e.reason ? (e.reason.stack || e.reason.message || e.reason) : String(e));
-    });
-    console.log('Starting app (protected mode)...');
-  </script>
-  <div class="app">
-    <header>
-      <button id="backBtn" class="back-btn">返回</button>
-      <h1>招商银行深圳市外币兑换地图信息表</h1>
-    </header>
-
-    <main>
-      <div class="container" id="viewRoot"></div>
-    </main>
-  </div>
-
-  <script>
-  try {
-    // currencies mapping only (names + branch name lists)
-    const data = {
-      currencies: [
-        { id: "hk_us_eur_jpy", name: "港币 / 美元 / 欧元 / 日元", note: "深圳分行所有网点均可办理" },
-        { id: "aud_gbp", name: "澳大利亚元 / 英镑", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","水榭花都支行","滨河时代支行","深纺大厦支行","皇岗支行","中央商务支行","泰然支行","华侨城支行","南山科创支行","前海分行营业部","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "cad", name: "加拿大元", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","泰然支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "sgd", name: "新加坡元（新元）", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","泰然支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "chf", name: "瑞士法郎", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行"] },
-        { id: "nzd", name: "新西兰元（纽元）", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深湾中心支行"] }
-      ]
-    };
-
-    // DOM
-    const root = document.getElementById('viewRoot');
-    const backBtn = document.getElementById('backBtn');
-
-    function getHashParts() {
-      const hash = location.hash || '#/';
-      let path = hash;
-      if (path.startsWith('#/')) path = path.slice(2);
-      else if (path.startsWith('#')) path = path.slice(1);
-      return path.split('/').filter(p => p.length > 0);
-    }
-
-    function router() {
-      try {
-        const parts = getHashParts();
-        if (parts.length === 0) {
-          renderHome();
-          showBack(false);
-          return;
-        }
-        const route = parts[0];
-        if (route === 'currency') {
-          const id = parts[1] ? decodeURIComponent(parts[1]) : '';
-          renderCurrency(id);
-          showBack(true);
-        } else if (route === 'branch') {
-          const encoded = parts.slice(1).join('/');
-          const name = encoded ? decodeURIComponent(encoded) : '';
-          renderBranch(name);
-          showBack(true);
-        } else {
-          renderHome();
-          showBack(false);
-        }
-      } catch (err) {
-        console.error('Routing error:', err);
-        showFatal(err.stack || err.message || err);
-        try { renderHome(); showBack(false); } catch(e){}
-      }
-    }
-
-    window.addEventListener('hashchange', router);
-    window.addEventListener('load', router);
-
-    backBtn.addEventListener('click', () => {
-      if (history.length > 1) history.back();
-      else location.hash = '#/';
-    });
-
-    function showBack(visible) { backBtn.style.display = visible ? 'inline-block' : 'none'; }
-
-    // Home: currency buttons
-    function renderHome() {
-      document.title = '招商银行深圳市外币兑换地图信息表';
-      root.innerHTML = '';
-      const wrapper = document.createElement('div');
-      wrapper.innerHTML = `<div class="section-title">币种选择</div>`;
-      const grid = document.createElement('div');
-      grid.className = 'list';
-      data.currencies.forEach(c => {
-        const btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.textContent = c.name;
-        btn.onclick = () => { location.hash = '#/currency/' + encodeURIComponent(c.id); };
-        grid.appendChild(btn);
-      });
-      wrapper.appendChild(grid);
-      root.appendChild(wrapper);
-    }
-
-    // Utility: escape HTML
-    function escapeHtml(text) {
-      if (!text && text !== 0) return '';
-      return String(text).replace(/[&<>\"']/g, function (s) {
-        return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'})[s];
-      });
-    }
-
-    // Format hours into human readable Chinese
-    function formatHours(hours) {
-      if (!hours) return '请致电或官网确认';
-      const parts = [];
-      if (hours.weekdays && hours.weekdays.open && hours.weekdays.close) {
-        parts.push(`周一 - 周五 ${hours.weekdays.open} - ${hours.weekdays.close}`);
-      }
-      if (hours.saturday && hours.saturday.open && hours.saturday.close) {
-        parts.push(`周六 ${hours.saturday.open} - ${hours.saturday.close}`);
-      } else {
-        parts.push('周六 休息');
-      }
-      if (hours.sunday && hours.sunday.open && hours.sunday.close) {
-        parts.push(`周日 ${hours.sunday.open} - ${hours.sunday.close}`);
-      } else {
-        parts.push('周日 休息');
-      }
-      return parts.join('； ');
-    }
-
-    // Render currency page: fetch branches, compute distances, sort, display
-    async function renderCurrency(id) {
-      const cur = data.currencies.find(x => x.id === id);
-      if (!cur) {
-        root.innerHTML = '<div class="section-title">未找到该币种</div>';
-        return;
-      }
-      document.title = `招商银行 - ${cur.name}`;
-      root.innerHTML = `<div class="section-title">${escapeHtml(cur.name)}</div>`;
-
-      if (cur.note) {
-        root.innerHTML += `<div class="detail"><div class="meta">${escapeHtml(cur.note)}</div></div>`;
-        return;
-      }
-
-      // fetch branches list
-      let branchesData;
-      try {
-        const r = await fetch('/api/branches');
-        const j = await r.json();
-        if (!j.ok) throw new Error('branches api error');
-        branchesData = j.branches;
-      } catch (e) {
-        console.error('fetch branches failed', e);
-        root.innerHTML += '<div class="note">无法获取网点数据，请稍后重试。</div>';
-        return;
-      }
-
-      const targetNames = Array.from(new Set(cur.branches || []));
-      let items = branchesData.filter(b => targetNames.includes(b.name));
-      // remove duplicates by name as a safeguard
-      items = items.filter((v,i,a) => a.findIndex(x => x.name === v.name) === i);
-
-      // get user location (timeout)
-      let userPos = null;
-      function getPositionPromise(timeout = 8000) {
-        return new Promise((resolve) => {
-          if (!navigator.geolocation) return resolve(null);
-          let resolved = false;
-          const timer = setTimeout(() => { if (!resolved) { resolved = true; resolve(null); } }, timeout);
-          navigator.geolocation.getCurrentPosition(pos => {
-            if (resolved) return;
-            resolved = true; clearTimeout(timer);
-            resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-          }, err => {
-            if (resolved) return;
-            resolved = true; clearTimeout(timer);
-            resolve(null);
-          }, { enableHighAccuracy: true, maximumAge: 60000, timeout: timeout });
-        });
-      }
-
-      userPos = await getPositionPromise(8000);
-
-      // Haversine
-      function haversine(lat1, lon1, lat2, lon2) {
-        const toRad = x => x * Math.PI / 180;
-        const R = 6371000;
-        const dLat = toRad(lat2 - lat1);
-        const dLon = toRad(lon2 - lon1);
-        const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-      }
-
-      items = items.map(b => {
-        if (userPos && isFinite(b.lat) && isFinite(b.lng)) {
-          const d = Math.round(haversine(userPos.lat, userPos.lng, b.lat, b.lng));
-          b._distance_m = d;
-          b._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
-        } else {
-          b._distance_m = null;
-          b._distance_text = '未知';
-        }
-        return b;
-      });
-
-      items.sort((a,b) => {
-        if (a._distance_m == null && b._distance_m == null) return 0;
-        if (a._distance_m == null) return 1;
-        if (b._distance_m == null) return -1;
-        return a._distance_m - b._distance_m;
-      });
-
-      const listEl = document.createElement('div');
-      listEl.className = 'list';
-      items.forEach(b => {
-        const item = document.createElement('div');
-        item.className = 'branch-item';
-        const left = document.createElement('div'); left.style.flex = '1';
-        left.innerHTML = `<div class="branch-name">${escapeHtml(b.name)}</div><div style="color:#666;font-size:14px;margin-top:6px">${escapeHtml(b.address)}</div>`;
-        const right = document.createElement('div'); right.style.display='flex'; right.style.flexDirection='column'; right.style.alignItems='flex-end';
-        right.innerHTML = `<div style="font-size:14px;color:#333;font-weight:600">${escapeHtml(b._distance_text)}</div>
-                           <div style="margin-top:8px;"><button class="action-btn" data-name="${encodeURIComponent(b.name)}">查看详情</button></div>`;
-        item.appendChild(left); item.appendChild(right); listEl.appendChild(item);
-      });
-
-      root.appendChild(listEl);
-
-      listEl.addEventListener('click', (ev) => {
-        const btn = ev.target.closest('button.action-btn');
-        if (!btn) return;
-        const name = decodeURIComponent(btn.getAttribute('data-name'));
-        location.hash = '#/branch/' + encodeURIComponent(name);
-      });
-    }
-
-    // branch detail: use branches.json (via /api/branches) and call /api/status for open/closed
-    async function renderBranch(name) {
-      document.title = `招商银行 - ${name || '网点详情'}`;
-      root.innerHTML = '';
-      const wrapper = document.createElement('div');
-      wrapper.className = 'container';
-      wrapper.innerHTML = `<div class="section-title">${escapeHtml(name)}</div>`;
-      root.appendChild(wrapper);
-
-      // load branches
-      let branchesData;
-      try {
-        const r = await fetch('/api/branches');
-        const j = await r.json();
-        if (!j.ok) throw new Error('branches api error');
-        branchesData = j.branches;
-      } catch (e) {
-        console.error('fetch branches failed', e);
-        wrapper.innerHTML += '<div class="note">无法获取网点数据，请稍后重试。</div>';
-        return;
-      }
-
-      const info = branchesData.find(b => b.name === name);
-      if (!info) {
-        wrapper.innerHTML += '<div class="detail"><div class="meta">该网点信息未找到。</div></div>';
-        return;
-      }
-
-      const card = document.createElement('div');
-      card.className = 'detail';
-      card.innerHTML = `
-        <h2>${escapeHtml(info.name)}</h2>
-        <div class="meta">
-          <div><strong>地址：</strong><span id="addrText">${escapeHtml(info.address)}</span></div>
-          <div><strong>联系方式：</strong>${escapeHtml(info.phone || '请致电95555或官网查询')}</div>
-          <div><strong>营业时间：</strong>${escapeHtml(formatHours(info.hours))}</div>
-          <div class="source"><strong>主要来源：</strong>${escapeHtml((info.source||[]).map(s=>s.title).join(' / '))}</div>
-        </div>
-        <div class="row">
-          <button id="copyBtn" class="copy-btn">复制地址</button>
-          <button id="navBtn" class="nav-btn">高德导航</button>
-          <button id="checkStatusBtn" class="btn" style="background:#FF8A33;padding:8px 10px;">查看营业状态</button>
-        </div>
-        ${(info.lat!=null && info.lng!=null) ? `<div style="margin-top:8px;color:#666;font-size:13px;">经纬度：${info.lng}, ${info.lat}</div>` : ''}
-        <div id="statusBox" class="note"></div>
-      `;
-      wrapper.appendChild(card);
-
-      const copyBtn = document.getElementById('copyBtn');
-      copyBtn.addEventListener('click', async () => {
-        try { await navigator.clipboard.writeText(info.address); copyBtn.textContent = '已复制 ✓'; setTimeout(()=>copyBtn.textContent='复制地址',1500); }
-        catch(e){ alert('复制失败，请手动复制：' + info.address); }
-      });
-
-      const navBtn = document.getElementById('navBtn');
-      navBtn.addEventListener('click', () => {
-        if (info.lng != null && info.lat != null) {
-          const pos = `${info.lng},${info.lat}`; const titleEnc = encodeURIComponent(info.name);
-          const uri = `https://uri.amap.com/marker?position=${pos}&name=${titleEnc}&coordinate=gaode&callnative=1`;
-          window.open(uri, '_blank');
-        } else {
-          const addrEnc = encodeURIComponent(info.address || info.name);
-          const uri = `https://uri.amap.com/search?query=${addrEnc}&callnative=1`;
-          window.open(uri, '_blank');
-        }
-      });
-
-      const statusBox = document.getElementById('statusBox');
-      const checkStatusBtn = document.getElementById('checkStatusBtn');
-      checkStatusBtn.addEventListener('click', async () => {
-        statusBox.textContent = '查询中...';
-        try {
-          const r = await fetch('/api/status?branch=' + encodeURIComponent(info.name));
-          const j = await r.json();
-          if (!j.ok) { statusBox.textContent = '状态查询失败'; console.error(j); return; }
-          statusBox.innerHTML = `<div>当前时间（Asia/Shanghai）：${j.now.weekday} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>
-                                 <div>营业状态：<strong style="color:${j.isOpen ? '#0a0' : '#a00'}">${j.isOpen ? '营业中' : '已关闭'}</strong></div>
-                                 <div>今日时段：${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : '无明确时段'}</div>`;
-        } catch (e) {
-          statusBox.textContent = '状态查询发生错误';
-          console.error(e);
-        }
-      });
-    }
-
-    // router
-    function routeHandler() { router(); }
-    window.addEventListener('hashchange', routeHandler);
-    window.addEventListener('load', routeHandler);
-
-    // initial router function wrapper for previous definitions
-    function router() {
-      try {
-        const parts = getHashParts();
-        if (parts.length === 0) { renderHome(); showBack(false); return; }
-        const route = parts[0];
-        if (route === 'currency') { const id = parts[1] ? decodeURIComponent(parts[1]) : ''; renderCurrency(id); showBack(true); }
-        else if (route === 'branch') { const encoded = parts.slice(1).join('/'); const name = encoded ? decodeURIComponent(encoded) : ''; renderBranch(name); showBack(true); }
-        else { renderHome(); showBack(false); }
-      } catch (err) { console.error('router error', err); showFatal(err.stack||err.message||err); renderHome(); showBack(false); }
-    }
-  } catch (err) {
-    console.error('Fatal error initializing app', err);
-    try { showFatal(err.stack || err.message || err); } catch(e){}
-  }
-  </script>
-</body>
-</html>
+@@
+-      wrapper.appendChild(card);
+-
+-      const copyBtn = document.getElementById('copyBtn');
+-      copyBtn.addEventListener('click', async () => {
+-        try { await navigator.clipboard.writeText(info.address); copyBtn.textContent = '已复制 ✓'; setTimeout(()=>copyBtn.textContent='复制地址',1500); }
+-        catch(e){ alert('复制失败，请手动复制：' + info.address); }
+-      });
+-
+-      const navBtn = document.getElementById('navBtn');
+-      navBtn.addEventListener('click', () => {
+-        if (info.lng != null && info.lat != null) {
+-          const pos = `${info.lng},${info.lat}`; const titleEnc = encodeURIComponent(info.name);
+-          const uri = `https://uri.amap.com/marker?position=${pos}&name=${titleEnc}&coordinate=gaode&callnative=1`;
+-          window.open(uri, '_blank');
+-        } else {
+-          const addrEnc = encodeURIComponent(info.address || info.name);
+-          const uri = `https://uri.amap.com/search?query=${addrEnc}&callnative=1`;
+-          window.open(uri, '_blank');
+-        }
+-      });
+-
+-      const statusBox = document.getElementById('statusBox');
+-      const checkStatusBtn = document.getElementById('checkStatusBtn');
+-      checkStatusBtn.addEventListener('click', async () => {
+-        statusBox.textContent = '查询中...';
+-        try {
+-          const r = await fetch('/api/status?branch=' + encodeURIComponent(info.name));
+-          const j = await r.json();
+-          if (!j.ok) { statusBox.textContent = '状态查询失败'; console.error(j); return; }
+-          statusBox.innerHTML = `<div>当前时间（Asia/Shanghai）：${j.now.weekday} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>
+-                                 <div>营业状态：<strong style="color:${j.isOpen ? '#0a0' : '#a00'}">${j.isOpen ? '营业中' : '已关闭'}</strong></div>
+-                                 <div>今日时段：${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : '无明确时段'}</div>`;
+-        } catch (e) {
+-          statusBox.textContent = '状态查询发生错误';
+-          console.error(e);
+-        }
+-      });
++      wrapper.appendChild(card);
++
++      // Attach handlers scoped to this card to avoid global id lookup issues
++      const copyBtn = card.querySelector('#copyBtn') || card.querySelector('.copy-btn');
++      if (copyBtn) {
++        copyBtn.addEventListener('click', async () => {
++          try { await navigator.clipboard.writeText(info.address); copyBtn.textContent = '已复制 ✓'; setTimeout(()=>copyBtn.textContent='复制地址',1500); }
++          catch(e){ alert('复制失败，请手动复制：' + info.address); }
++        });
++      } else {
++        console.warn('copyBtn not found for branch', info && info.name);
++      }
++
++      const navBtnEl = card.querySelector('#navBtn') || card.querySelector('.nav-btn');
++      if (navBtnEl) {
++        navBtnEl.addEventListener('click', () => {
++          if (info.lng != null && info.lat != null) {
++            const pos = `${info.lng},${info.lat}`; const titleEnc = encodeURIComponent(info.name);
++            const uri = `https://uri.amap.com/marker?position=${pos}&name=${titleEnc}&coordinate=gaode&callnative=1`;
++            window.open(uri, '_blank');
++          } else {
++            const addrEnc = encodeURIComponent(info.address || info.name);
++            const uri = `https://uri.amap.com/search?query=${addrEnc}&callnative=1`;
++            window.open(uri, '_blank');
++          }
++        });
++      } else {
++        console.warn('navBtn not found for branch', info && info.name);
++      }
++
++      const statusBoxEl = card.querySelector('#statusBox') || card.querySelector('.note');
++      const checkStatusBtnEl = card.querySelector('#checkStatusBtn') || card.querySelector('.btn');
++      if (checkStatusBtnEl) {
++        checkStatusBtnEl.addEventListener('click', async () => {
++          if (statusBoxEl) statusBoxEl.textContent = '查询中...';
++          try {
++            const r = await fetch('/api/status?branch=' + encodeURIComponent(info.name));
++            const j = await r.json();
++            if (!j.ok) { if (statusBoxEl) statusBoxEl.textContent = '状态查询失败'; console.error(j); return; }
++            if (statusBoxEl) statusBoxEl.innerHTML = `<div>当前时间（Asia/Shanghai）：${j.now.weekday} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>\n                                 <div>营业状态：<strong style="color:${j.isOpen ? '#0a0' : '#a00'}">${j.isOpen ? '营业中' : '已关闭'}</strong></div>\n                                 <div>今日时段：${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : '无明确时段'}</div>`;
++          } catch (e) {
++            if (statusBoxEl) statusBoxEl.textContent = '状态查询发生错误';
++            console.error(e);
++          }
++        });
++      } else {
++        console.warn('checkStatusBtn not found for branch', info && info.name);
++      }
