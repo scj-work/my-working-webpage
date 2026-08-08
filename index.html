@@ -186,8 +186,10 @@
         return;
       }
 
-      const targetNames = cur.branches || [];
+      const targetNames = Array.from(new Set(cur.branches || []));
       let items = branchesData.filter(b => targetNames.includes(b.name));
++      // remove duplicates by name as a safeguard
++      items = items.filter((v,i,a) => a.findIndex(x => x.name === v.name) === i);
 
       // get user location (timeout)
       let userPos = null;
