@@ -133,9 +133,29 @@
     // Utility: escape HTML
     function escapeHtml(text) {
       if (!text && text !== 0) return '';
-      return String(text).replace(/[&<>"']/g, function (s) {
-        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s];
+      return String(text).replace(/[&<>\"']/g, function (s) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'})[s];
       });
+    }
+
+    // Format hours into human readable Chinese
+    function formatHours(hours) {
+      if (!hours) return '请致电或官网确认';
+      const parts = [];
+      if (hours.weekdays && hours.weekdays.open && hours.weekdays.close) {
+        parts.push(`周一 - 周五 ${hours.weekdays.open} - ${hours.weekdays.close}`);
+      }
+      if (hours.saturday && hours.saturday.open && hours.saturday.close) {
+        parts.push(`周六 ${hours.saturday.open} - ${hours.saturday.close}`);
+      } else {
+        parts.push('周六 休息');
+      }
+      if (hours.sunday && hours.sunday.open && hours.sunday.close) {
+        parts.push(`周日 ${hours.sunday.open} - ${hours.sunday.close}`);
+      } else {
+        parts.push('周日 休息');
+      }
+      return parts.join('； ');
     }
 
     // Render currency page: fetch branches, compute distances, sort, display
@@ -278,7 +298,7 @@
         <div class="meta">
           <div><strong>地址：</strong><span id="addrText">${escapeHtml(info.address)}</span></div>
           <div><strong>联系方式：</strong>${escapeHtml(info.phone || '请致电95555或官网查询')}</div>
-          <div><strong>营业时间：</strong>${escapeHtml(info.hours ? JSON.stringify(info.hours) : '请致电或官网确认')}</div>
+          <div><strong>营业时间：</strong>${escapeHtml(formatHours(info.hours))}</div>
           <div class="source"><strong>主要来源：</strong>${escapeHtml((info.source||[]).map(s=>s.title).join(' / '))}</div>
         </div>
         <div class="row">
