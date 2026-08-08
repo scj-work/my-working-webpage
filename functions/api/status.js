@@ -10,11 +10,11 @@ export async function onRequest(context) {
     const branch = branches.find(b => b.name === branchName) || branches[0];
     if (!branch) return new Response(JSON.stringify({ ok:false, error:'branch not found' }), { status:404, headers:{'content-type':'application/json','Access-Control-Allow-Origin':'*'} });
 
-    // Asia/Shanghai current time parts
+    // Asia/Shanghai current time parts (Chinese short weekday like 周一)
     const now = new Date();
-    const tzOptions = { timeZone: 'Asia/Shanghai', hour12: false, hour: '2-digit', minute: '2-digit', weekday: 'long' };
-    const parts = new Intl.DateTimeFormat('en-US', tzOptions).formatToParts(now);
-    let hour = 0, minute = 0, weekday = 'Monday';
+    const tzOptions = { timeZone: 'Asia/Shanghai', hour12: false, hour: '2-digit', minute: '2-digit', weekday: 'short' };
+    const parts = new Intl.DateTimeFormat('zh-CN', tzOptions).formatToParts(now);
+    let hour = 0, minute = 0, weekday = '周一';
     for (const p of parts) {
       if (p.type === 'hour') hour = parseInt(p.value, 10);
       if (p.type === 'minute') minute = parseInt(p.value, 10);
@@ -27,7 +27,13 @@ export async function onRequest(context) {
       return hh * 60 + (mm || 0);
     };
 
-    const d = weekday.toLowerCase();
+    const d = (function(w){
+      // normalize weekday to english-like key for logic: '周一' -> 'monday'
+      if (!w) return 'monday';
+      const map = { '周一':'monday','周二':'tuesday','周三':'wednesday','周四':'thursday','周五':'friday','周六':'saturday','周日':'sunday','星期一':'monday','星期二':'tuesday','星期三':'wednesday','星期四':'thursday','星期五':'friday','星期六':'saturday','星期日':'sunday' };
+      return map[w] || w.toLowerCase();
+    })(weekday);
+
     let openPeriod = null;
     if (d === 'saturday') openPeriod = branch.hours && branch.hours.saturday;
     else if (d === 'sunday') openPeriod = branch.hours && branch.hours.sunday;
