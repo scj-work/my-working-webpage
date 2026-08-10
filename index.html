@@ -32,6 +32,17 @@
     .statusBox { margin-top:8px;color:#888;font-size:14px; }
     .hidden { display:none; }
 
+    /* 首页蓝色温馨提示样式 */
+    .home-warn-tip{
+      margin-top:16px;
+      padding:10px 14px;
+      background:#e8f4ff;
+      border-radius:6px;
+      color:#0052cc;
+      font-size:14px;
+      line-height:1.6;
+    }
+
     /* ========== 免责提示（跟随内容滚动） ========== */
     .disclaimer-tip {
       font-size: 13px;
@@ -203,6 +214,12 @@
         grid.appendChild(btn);
       });
       wrapper.appendChild(grid);
+      // 首页蓝色温馨提示，放在币种按钮列表下方
+      const tipDiv = document.createElement('div');
+      tipDiv.className = 'home-warn-tip';
+      tipDiv.innerText = '温馨提示：除以上币种外，其他币种的外币兑换请进中国银行官网查询。';
+      wrapper.appendChild(tipDiv);
+
       root.appendChild(wrapper);
     }
 
