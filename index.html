@@ -25,6 +25,7 @@
     .meta { margin:8px 0; line-height:1.7; font-size:16px; }
     .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:8px; }
     .copy-btn { background:#f5f5f5; border:1px solid #ddd; padding:8px 10px; border-radius:4px; cursor:pointer; font-size:14px; }
+    .phone-btn { background:#22c55e; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:14px; }
     .nav-btn { background:#FF6A00; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:14px; }
     .checkStatusBtn { background:#FF8A33; border:none; color:#fff;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:14px; }
     .source { margin-top:10px; color:#666; font-size:13px; }
@@ -371,6 +372,7 @@
         </div>
         <div class="row">
           <button class="copy-btn">复制地址</button>
+          <button class="phone-btn">拨打电话</button>
           <button class="nav-btn">高德导航</button>
           <button class="checkStatusBtn">查看营业状态</button>
         </div>
@@ -385,6 +387,13 @@
           const copyText = '招商银行' + info.name + '\n' + info.address;
           try { await navigator.clipboard.writeText(copyText); copyBtn.textContent = '已复制 ✓'; setTimeout(()=>copyBtn.textContent='复制地址',1500); }
           catch(e){ alert('复制失败，请手动复制：' + copyText); }
+        });
+      }
+
+      const phoneBtn = card.querySelector('.phone-btn');
+      if (phoneBtn && info.phone) {
+        phoneBtn.addEventListener('click', () => {
+          window.location.href = 'tel:' + info.phone;
         });
       }
 
