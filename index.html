@@ -382,8 +382,9 @@
       const copyBtn = card.querySelector('.copy-btn');
       if (copyBtn) {
         copyBtn.addEventListener('click', async () => {
-          try { await navigator.clipboard.writeText(info.address); copyBtn.textContent = '已复制 ✓'; setTimeout(()=>copyBtn.textContent='复制地址',1500); }
-          catch(e){ alert('复制失败，请手动复制：' + info.address); }
+          const copyText = '招商银行' + info.name + '\n' + info.address;
+          try { await navigator.clipboard.writeText(copyText); copyBtn.textContent = '已复制 ✓'; setTimeout(()=>copyBtn.textContent='复制地址',1500); }
+          catch(e){ alert('复制失败，请手动复制：' + copyText); }
         });
       }
 
