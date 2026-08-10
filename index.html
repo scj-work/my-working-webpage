@@ -377,7 +377,7 @@
           <button class="nav-btn">高德导航</button>
           <button class="checkStatusBtn">查看营业状态</button>
         </div>
-        ${(info.lat!=null && info.lng!=null) ? `<div style="margin-top:8px;color:#666;font-size:13px;">经纬度：${info.lng}, ${info.lat}</div>` : ''}
+        ${(info.lat!=null && info.lng!=null) ? `<div style="margin-top:8px;color:#666;font-size:13px;">经度：${info.lng}，纬度：${info.lat}</div>` : ''}
         <div class="statusBox"></div>
       `;
       wrapper.appendChild(card);
@@ -394,13 +394,17 @@
       const navBtnEl = card.querySelector('.nav-btn');
       if (navBtnEl) {
         navBtnEl.addEventListener('click', () => {
+          // 注意：如果你的branches数据是GPS原始WGS84，coordinate改为 wgs84；高德火星坐标使用 gaode
+          const COORD_TYPE = "gaode";
+          const titleEnc = encodeURIComponent(info.name);
           if (info.lng != null && info.lat != null) {
-            const pos = `${info.lng},${info.lat}`; const titleEnc = encodeURIComponent(info.name);
-            const uri = `https://uri.amap.com/marker?position=${pos}&name=${titleEnc}&coordinate=gaode&callnative=1`;
+            // 使用导航接口 navigation，直接进入路线规划，而不是marker仅查看点位
+            const uri = `https://uri.amap.com/navigation?to=${info.lng},${info.lat},${titleEnc}&mode=car&coordinate=${COORD_TYPE}&src=web_app&callnative=1`;
             window.open(uri, '_blank');
           } else {
+            // 无经纬度，降级地址搜索
             const addrEnc = encodeURIComponent(info.address || info.name);
-            const uri = `https://uri.amap.com/search?query=${addrEnc}&callnative=1`;
+            const uri = `https://uri.amap.com/search?query=${addrEnc}&src=web_app&callnative=1`;
             window.open(uri, '_blank');
           }
         });
