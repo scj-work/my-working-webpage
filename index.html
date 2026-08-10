@@ -195,20 +195,7 @@
       return lat >= 22.45 && lat <= 22.87 && lon >= 113.75 && lon <= 114.65;
     }
 
-    // 地理编码：强制限定城市深圳市，加延时防OSM限流
-    async function geocodeAddress(address) {
-      await new Promise(r => setTimeout(r, 350));
-      const fullQuery = `${address}，深圳市`;
-      const q = encodeURIComponent(fullQuery);
-      const resp = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&country=CN&city=深圳市&format=json&limit=1`);
-      const arr = await resp.json();
-      if(!arr || arr.length ===0) return null;
-      const lat = parseFloat(arr[0].lat);
-      const lon = parseFloat(arr[0].lon);
-      if(!isFinite(lat) || !isFinite(lon)) return null;
-      if(!isInShenzhen(lat, lon)) return null;
-      return { lat, lng: lon };
-    }
+
 
     function renderHome() {
       document.title = '招商银行深圳市外币兑换地图信息表';
@@ -294,37 +281,21 @@
           root.innerHTML += `<div class="note">⚠️未获取到您的位置，无法计算距离，请允许位置权限。</div>`;
         }
 
-        const enrichedItems = [];
-        for(const b of items){
-          let item = {...b};
-          if(userPos){
-            if(isFinite(item.lat) && isFinite(item.lng) && isInShenzhen(item.lat, item.lng)){
-              const d = Math.round(haversine(userPos.lat, userPos.lng, item.lat, item.lng));
-              item._distance_m = d;
-              item._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
-            }else{
-              try{
-                const geo = await geocodeAddress(item.address);
-                if(geo){
-                  const d = Math.round(haversine(userPos.lat, userPos.lng, geo.lat, geo.lng));
-                  item._distance_m = d;
-                  item._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
-                }else{
-                  item._distance_m = null;
-                  item._distance_text = '解析失败';
-                }
-              }catch(err){
-                console.warn('地理编码失败',item.name,err);
-                item._distance_m = null;
-                item._distance_text = '解析失败';
-              }
-            }
-          }else{
+        const enrichedItems = items.map(b => {
+          const item = {...b};
+          if(userPos && isFinite(item.lat) && isFinite(item.lng) && isInShenzhen(item.lat, item.lng)){
+            const d = Math.round(haversine(userPos.lat, userPos.lng, item.lat, item.lng));
+            item._distance_m = d;
+            item._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
+          }else if(!userPos){
             item._distance_m = null;
             item._distance_text = '无位置权限';
+          }else{
+            item._distance_m = null;
+            item._distance_text = '坐标异常';
           }
-          enrichedItems.push(item);
-        }
+          return item;
+        });
 
         enrichedItems.sort((a,b) => {
           if (a._distance_m == null && b._distance_m == null) return 0;
