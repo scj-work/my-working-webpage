@@ -395,7 +395,7 @@
       if (navBtnEl) {
         navBtnEl.addEventListener('click', () => {
           // 注意：如果你的branches数据是GPS原始WGS84，coordinate改为 wgs84；高德火星坐标使用 gaode
-          const COORD_TYPE = "wgs84";
+          const COORD_TYPE = "gaode";
           const titleEnc = encodeURIComponent(info.name);
           if (info.lng != null && info.lat != null) {
             // 使用导航接口 navigation，直接进入路线规划，而不是marker仅查看点位
