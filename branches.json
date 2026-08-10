@@ -1,278 +1,349 @@
 [
   {
     "name": "罗湖支行",
-    "address": "罗湖区人民南路3005号深房广场1楼（国贸地铁站B口）",
+    "address": "罗湖区人民南路3005号深房广场A座1楼",
     "phone": "0755-82184978",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": { "open": "09:00", "close": "16:00" }, "sunday": null },
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": { "open": "09:00", "close": "16:00" },
+      "sunday": null
+    },
     "lat": 22.540931,
     "lng": 114.118257,
     "source": [
       { "title": "招商银行官网 - 网点查询", "url": "https://map.cmbchina.com/map" },
-      { "title": "高德地图 - 罗湖支行", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "深圳分行营业部",
-    "address": "福田区深南大道2016号招商银行深圳分行大厦",
-    "phone": "0755-83198888",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
+    "address": "福田区深南大道2016号招商银行深圳分行大厦首层",
+    "phone": "0755-88025100",
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": { "open": "09:00", "close": "16:00" },
+      "sunday": { "open": "09:00", "close": "16:00" }
+    },
     "lat": 22.541246,
     "lng": 114.029794,
     "source": [
       { "title": "招商银行官网 - 深圳分行", "url": "https://branch.cmbchina.com/0755.htm" },
-      { "title": "高德地图 - 招商银行深圳分行", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "蛇口支行",
     "address": "南山区蛇口招商路招商大厦首层",
     "phone": "0755-21605391",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.48685,
-    "lng": 113.91953,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "lat": 22.486850,
+    "lng": 113.919530,
     "source": [
-      { "title": "高德地图 - 蛇口支行", "url": "https://ditu.amap.com/" },
-      { "title": "本地站点 - 蛇口支行", "url": "https://sz.city8.com/financial/85jvyo70amzsbbe54c" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "建安支行",
-    "address": "宝安区宝安六区建安一路74号",
+    "address": "宝安区新安街道建安一路74号",
     "phone": "0755-27881000",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
     "lat": 22.561519,
     "lng": 113.883993,
     "source": [
-      { "title": "本地站点 - 建安支行", "url": "https://zhidao.baidu.com/question/436640396279406652.html" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "水榭花都支行",
-    "address": "香梅路香蜜湖水榭花都（三期）商业区",
+    "address": "福田区香梅路香蜜湖水榭花都三期商业区101铺",
     "phone": "0755-82733601",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.5502,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "lat": 22.550200,
     "lng": 114.033657,
     "source": [
-      { "title": "企查查 - 水榭花都支行", "url": "https://www.qcc.com/firm/214a432ce934209e7472d747f4f926b9.html" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "滨河时代支行",
-    "address": "福田区滨河大道KKONE一楼北入口侧（下沙站附近）",
+    "address": "福田区滨河大道9289号KKONE购物中心一楼北入口",
     "phone": "0755-83442064",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": { "open": "09:00", "close": "16:00" }, "sunday": null },
-    "lat": 22.53382,
-    "lng": 114.0369,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": { "open": "09:00", "close": "16:00" },
+      "sunday": null
+    },
+    "lat": 22.533820,
+    "lng": 114.036900,
     "source": [
-      { "title": "本地宝 - 滨河时代支行", "url": "https://sz.bendibao.com/wangdian/dian/5637600.shtm" },
-      { "title": "招商银行官网", "url": "https://cmbchina.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "深纺大厦支行",
     "address": "福田区华强北路3号深纺大厦AB座首层",
     "phone": "0755-83754837",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": { "open": "09:00", "close": "16:00" },
+      "sunday": null
+    },
     "lat": 22.542403,
     "lng": 114.088796,
     "source": [
-      { "title": "本地站点 - 深纺大厦支行", "url": "https://sz.bendibao.com/wangdian/dian/5637561.shtm" },
-      { "title": "企查查 - 深纺大厦支行", "url": "https://www.qcc.com/firm/a5906904df05e134dd94037896b1beb1.html" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "皇岗支行",
-    "address": "福田区彩田南路中深花园B座首层",
-    "phone": "0755-82995986",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.5239,
-    "lng": 114.0524,
+    "address": "福田区彩田南路2030号中深花园B座首层",
+    "phone": "0755-82996765",
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": { "open": "09:00", "close": "16:00" }
+    },
+    "lat": 22.523900,
+    "lng": 114.052400,
     "source": [
-      { "title": "招商银行分行公告", "url": "https://branch.cmbchina.com/0755/notice/202505220004.htm" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "中央商务支行",
     "address": "福田区福华一路88号中心商务大厦1楼",
     "phone": "0755-82032768",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": { "open": "09:00", "close": "16:00" }, "sunday": null },
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": { "open": "09:00", "close": "16:00" },
+      "sunday": null
+    },
     "lat": 22.531347,
     "lng": 114.052818,
     "source": [
-      { "title": "深圳之窗 - 网点汇总", "url": "https://m.shenchuang.com/show/1483444_2.shtml" },
-      { "title": "招商银行官网", "url": "https://cmbchina.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "泰然支行",
-    "address": "福田区泰然九路海松大厦首层（泰然金谷支行）",
+    "address": "福田区泰然九路1号海松大厦首层",
     "phone": "0755-82044296",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
     "lat": 22.542258,
     "lng": 114.034898,
     "source": [
-      { "title": "百度百科 - 泰然金谷支行", "url": "https://baike.baidu.com/item/%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E6%B7%B1%E5%9C%B3%E6%B3%B0%E7%84%B6%E9%87%91%E8%B0%B7%E6%94%AF%E8%A1%8C/52419321" },
-      { "title": "招商银行公告", "url": "https://branch.cmbchina.com/0755/notice/202607100003.htm" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "华侨城支行",
-    "address": "南山区华侨城东方花园综合楼/服务楼首层",
+    "address": "南山区华侨城侨城东路东方花园综合楼首层",
     "phone": "0755-26609248",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.5401,
-    "lng": 113.9828,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "lat": 22.540100,
+    "lng": 113.982800,
     "source": [
-      { "title": "本地资讯 - 华侨城支行", "url": "https://sz.dushiquan.net/poi/1326/" },
-      { "title": "百度百科 - 华侨城支行", "url": "https://baike.baidu.com/item/%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%E6%B7%B1%E5%9C%B3%E5%8D%8E%E4%BE%A8%E5%9F%8E%E6%94%AF%E8%A1%8C/52090465" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "南山科创支行",
-    "address": "南山区海岸城/科创园区周边（以网点公告为准）",
-    "phone": "",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.51458,
-    "lng": 113.93499,
+    "address": "南山区海德三道文心五路33号海岸大厦西座1层",
+    "phone": "0755-86052383",
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": { "open": "09:00", "close": "16:00" },
+      "sunday": null
+    },
+    "lat": 22.514962,
+    "lng": 113.935314,
     "source": [
-      { "title": "招商银行官网 - 服务网点", "url": "https://www.cmbchina.com/" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "前海分行营业部",
-    "address": "前海卓越金融中心/前海片区办公楼（以导航为准）",
-    "phone": "0755-86939083",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.526655,
-    "lng": 113.907235,
+    "address": "南山区梦海大道5033号卓越前海壹号T9B首层",
+    "phone": "0755-26891186",
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": { "open": "09:00", "close": "16:00" }
+    },
+    "lat": 22.526841,
+    "lng": 113.906427,
     "source": [
-      { "title": "本地金融服务 - 前海分行营业部", "url": "https://m.city8.com/sz/financial/85jg8270bh0ob9b448" },
-      { "title": "企查查 - 前海分行", "url": "https://www.qcc.com/firm/19cf106afab8952aa80c968d171ab4c3.html" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "盐田支行",
-    "address": "盐田区沙头角官吓路69号瀚海东岸首层",
+    "address": "盐田区沙头角官下路69号瀚海东岸首层",
     "phone": "0755-25558801",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": { "open": "09:00", "close": "16:00" }, "sunday": null },
-    "lat": 22.536,
-    "lng": 114.241,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": { "open": "09:00", "close": "16:00" },
+      "sunday": null
+    },
+    "lat": 22.536000,
+    "lng": 114.241000,
     "source": [
-      { "title": "深圳本地宝 - 盐田支行", "url": "https://m.cmbchina.com/officesearch.html" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "布吉支行",
-    "address": "龙岗区百鸽路270号",
+    "address": "龙岗区百鸽路270号百合星城一期首层",
     "phone": "0755-28579345",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.6297,
-    "lng": 114.1116,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "lat": 22.629700,
+    "lng": 114.111600,
     "source": [
-      { "title": "银行网点查询 - 布吉支行", "url": "https://banks.chalianhanghao.com/s/33022.html" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "深湾中心支行",
-    "address": "南山区深湾二路/深湾中心（总部地块南侧）",
-    "phone": "0755-83195306",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.521,
-    "lng": 113.943,
+    "address": "南山区白石四道深湾中心大厦首层",
+    "phone": "0755-84391000",
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": { "open": "09:00", "close": "16:00" },
+      "sunday": { "open": "09:00", "close": "16:00" }
+    },
+    "lat": 22.520817,
+    "lng": 113.942246,
     "source": [
-      { "title": "企查查 - 深湾中心支行", "url": "https://www.qcc.com/firm/a7e67ce29edd226c70a727922bd28bf2.html" },
-      { "title": "招商银行分行公告", "url": "https://branch.cmbchina.com/0755/notice/20260710005.htm" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "波托菲诺支行",
-    "address": "南山区华侨城纯水岸综合市场101B",
+    "address": "南山区华侨城纯水岸商业街101B铺",
     "phone": "0755-26609547",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.54,
-    "lng": 113.985,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "lat": 22.540000,
+    "lng": 113.985000,
     "source": [
-      { "title": "爱企查 - 波托菲诺支行", "url": "https://aiqicha.baidu.com/company_detail_30950375062658" },
-      { "title": "本地站点 - 网点位置", "url": "https://sz.city8.com/financial/..." }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "高新园科创支行",
     "address": "南山区高新南七路16号德维森大厦1层",
     "phone": "0755-86187681",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
     "lat": 22.534143,
     "lng": 113.946611,
     "source": [
-      { "title": "高德地图 - 高新园支行", "url": "https://ditu.amap.com/place/B0FFG88FJF" },
-      { "title": "企查查", "url": "https://www.qcc.com/firm/3393260f7d5b0a4d5f53da5b13fed430.html" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "龙华支行",
-    "address": "龙华区人民路4022号壹方天地A区L1-023",
+    "address": "龙华区人民路4022号壹方天地A区L1‑023铺",
     "phone": "0755-28102130",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": { "open": "09:00", "close": "16:00" }, "sunday": null },
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": { "open": "09:00", "close": "16:00" },
+      "sunday": null
+    },
     "lat": 22.648108,
     "lng": 114.027937,
     "source": [
-      { "title": "深圳本地宝 - 龙华支行", "url": "https://sz.bendibao.com/wangdian/dian/5637566.shtm" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "新时代支行",
-    "address": "蛇口太子路1号新时代广场首层",
+    "address": "南山区蛇口太子路1号新时代广场首层",
     "phone": "0755-26673212",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.495,
-    "lng": 113.925,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "lat": 22.495000,
+    "lng": 113.925000,
     "source": [
-      { "title": "本地站点 - 新时代支行", "url": "https://m.shenchuang.com/show/1483444_7.shtml" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "上步支行",
-    "address": "深南大道1002号新闻大厦首层",
+    "address": "福田区深南中路1002号新闻大厦首层",
     "phone": "0755-82095606",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.541,
-    "lng": 114.056,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "lat": 22.541000,
+    "lng": 114.056000,
     "source": [
-      { "title": "爱企查 - 上步支行", "url": "https://aiqicha.baidu.com/company_detail_33712767306115" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "金丰城支行",
-    "address": "深南东路5015号金丰城大厦B座一楼",
+    "address": "罗湖区深南东路5015号金丰城大厦B座一楼",
     "phone": "0755-82070257",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
     "lat": 22.541978,
     "lng": 114.118272,
     "source": [
-      { "title": "tzshuo - 支行列表", "url": "https://www.tzshuo.com/yinhang/20395.html" },
-      { "title": "高德地图", "url": "https://ditu.amap.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   },
   {
     "name": "福强支行",
-    "address": "福田区金田南路御庭苑首层",
+    "address": "福田区金田南路御庭苑首层商铺",
     "phone": "0755-83431251",
-    "hours": { "weekdays": { "open": "09:00", "close": "17:00" }, "saturday": null, "sunday": null },
-    "lat": 22.52227,
-    "lng": 114.05572,
+    "hours": {
+      "weekdays": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "lat": 22.522270,
+    "lng": 114.055720,
     "source": [
-      { "title": "企查查 - 福强支行", "url": "https://www.qcc.com/firm/7a952b5bd7d14c85a0e301bc1e8f7ef1.html" },
-      { "title": "招商银行官网", "url": "https://cmbchina.com/" }
+      { "title": "高德地图POI", "url": "https://ditu.amap.com/" }
     ]
   }
 ]
