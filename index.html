@@ -32,7 +32,6 @@
     .statusBox { margin-top:8px;color:#888;font-size:14px; }
     .hidden { display:none; }
 
-    /* ========== 免责提示（跟随内容滚动） ========== */
     .disclaimer-tip {
       font-size: 13px;
       color: #666666;
@@ -52,7 +51,6 @@
 </head>
 <body>
   <script>
-    // Global error handlers so we can see why the app fails instead of blank screen
     function showFatal(msg) {
       try {
         var box = document.getElementById('appErrorBox');
@@ -87,7 +85,6 @@
 
     <main>
       <div class="container" id="viewRoot"></div>
-      <!-- ✅ 放在main内部，属于页面内容的一部分，随页面滚动到底部出现 -->
       <div class="disclaimer-tip">
         ⚠️ 营业时间仅供参考。节假日、临时停业以招商银行官方公告及网点现场为准，建议电话确认。距离由地址解析计算得出，仅供参考。
       </div>
@@ -96,7 +93,6 @@
 
   <script>
   try {
-    // currencies mapping only (names + branch name lists)
     const data = {
       currencies: [
         { id: "hk_us_eur_jpy", name: "港币 / 美元 / 欧元 / 日元", note: "深圳分行所有网点均可办理" },
@@ -108,7 +104,6 @@
       ]
     };
 
-    // DOM
     const root = document.getElementById('viewRoot');
     const backBtn = document.getElementById('backBtn');
 
@@ -159,7 +154,6 @@
 
     function showBack(visible) { backBtn.style.display = visible ? 'inline-block' : 'none'; }
 
-    // Utility: escape HTML
     function escapeHtml(text) {
       if (!text && text !== 0) return '';
       return String(text).replace(/[&<>\"']/g, function (s) {
@@ -167,7 +161,6 @@
       });
     }
 
-    // Format hours into human readable Chinese
     function formatHours(hours) {
       if (!hours) return '请致电或官网确认';
       const parts = [];
@@ -187,7 +180,6 @@
       return parts.join('； ');
     }
 
-    // Haversine 距离计算
     function haversine(lat1, lon1, lat2, lon2) {
       const toRad = x => x * Math.PI / 180;
       const R = 6371000;
@@ -198,16 +190,26 @@
       return R * c;
     }
 
-    // OSM Nominatim 公开地理编码：地址转经纬度，无密钥，有频率限制
-    async function geocodeAddress(address) {
-      const q = encodeURIComponent(address);
-      const resp = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1`);
-      const arr = await resp.json();
-      if(!arr || arr.length ===0) return null;
-      return { lat:parseFloat(arr[0].lat), lng:parseFloat(arr[0].lon) };
+    // 深圳地理边界：过滤掉解析到外地的错误坐标
+    function isInShenzhen(lat, lon) {
+      return lat >= 22.45 && lat <= 22.87 && lon >= 113.75 && lon <= 114.65;
     }
 
-    // Home: currency buttons 【已移除蓝色温馨提示】
+    // 地理编码：强制限定城市深圳市，加延时防OSM限流
+    async function geocodeAddress(address) {
+      await new Promise(r => setTimeout(r, 350));
+      const fullQuery = `${address}，深圳市`;
+      const q = encodeURIComponent(fullQuery);
+      const resp = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&country=CN&city=深圳市&format=json&limit=1`);
+      const arr = await resp.json();
+      if(!arr || arr.length ===0) return null;
+      const lat = parseFloat(arr[0].lat);
+      const lon = parseFloat(arr[0].lon);
+      if(!isFinite(lat) || !isFinite(lon)) return null;
+      if(!isInShenzhen(lat, lon)) return null;
+      return { lat, lng: lon };
+    }
+
     function renderHome() {
       document.title = '招商银行深圳市外币兑换地图信息表';
       root.innerHTML = '';
@@ -227,7 +229,6 @@
     }
 
     let renderCurrencyRunning = false;
-    // Render currency page: fetch branches, geocode address for no‑latlng item, compute distances, sort, display
     async function renderCurrency(id) {
       if(renderCurrencyRunning) return;
       renderCurrencyRunning = true;
@@ -245,7 +246,6 @@
           return;
         }
 
-        // fetch branches list
         let branchesData;
         try {
           const r = await fetch('/api/branches');
@@ -258,14 +258,10 @@
           return;
         }
 
-        // normalize name helper: remove zero‑width / nbsp, collapse spaces, trim, lower
         const norm = s => s ? String(s).replace(/[\u200B\uFEFF\u00A0]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase() : '';
-
-        // dedupe target names (normalize) and find matching branches by normalized name
         const targetNames = Array.from(new Set((cur.branches || []).map(n => norm(n))));
         let items = (branchesData || []).filter(b => targetNames.includes(norm(b.name)));
     
-        // remove duplicates by normalized name, keep first occurrence
         const seen = new Set();
         items = items.filter(b => {
           const k = norm(b.name);
@@ -274,7 +270,6 @@
           return true;
         });
 
-        // get user location (timeout)
         let userPos = null;
         function getPositionPromise(timeout = 8000) {
           return new Promise((resolve) => {
@@ -299,18 +294,15 @@
           root.innerHTML += `<div class="note">⚠️未获取到您的位置，无法计算距离，请允许位置权限。</div>`;
         }
 
-        // 对缺少经纬度的网点，使用地址在线解析获取坐标
         const enrichedItems = [];
         for(const b of items){
           let item = {...b};
           if(userPos){
-            // 已有合法经纬度直接使用
-            if(isFinite(item.lat) && isFinite(item.lng)){
+            if(isFinite(item.lat) && isFinite(item.lng) && isInShenzhen(item.lat, item.lng)){
               const d = Math.round(haversine(userPos.lat, userPos.lng, item.lat, item.lng));
               item._distance_m = d;
               item._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
             }else{
-              // 无经纬度，调用地理编码解析地址
               try{
                 const geo = await geocodeAddress(item.address);
                 if(geo){
@@ -334,7 +326,6 @@
           enrichedItems.push(item);
         }
 
-        // 排序，解析失败放最后
         enrichedItems.sort((a,b) => {
           if (a._distance_m == null && b._distance_m == null) return 0;
           if (a._distance_m == null) return 1;
@@ -368,7 +359,6 @@
       }
     }
 
-    // branch detail: use branches.json (via /api/branches) and call /api/status for open/closed
     async function renderBranch(name) {
       document.title = `招商银行 - ${name || '网点详情'}`;
       root.innerHTML = '';
@@ -377,7 +367,6 @@
       wrapper.innerHTML = `<div class="section-title">${escapeHtml(name)}</div>`;
       root.appendChild(wrapper);
 
-      // load branches
       let branchesData;
       try {
         const r = await fetch('/api/branches');
@@ -419,7 +408,6 @@
       `;
       wrapper.appendChild(card);
 
-      // Attach handlers scoped to this card
       const copyBtn = card.querySelector('.copy-btn');
       if (copyBtn) {
         copyBtn.addEventListener('click', async () => {
@@ -431,7 +419,6 @@
       const navBtnEl = card.querySelector('.nav-btn');
       if (navBtnEl) {
         navBtnEl.addEventListener('click', () => {
-          // 完全绕过经纬度，直接传入完整地址文本给高德导航接口 to=::地址
           const addrEnc = encodeURIComponent(info.address);
           const uri = `https://uri.amap.com/navigation?to=::${addrEnc}&mode=car&src=web_app&callnative=1`;
           window.open(uri, '_blank');
