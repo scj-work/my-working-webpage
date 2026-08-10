@@ -28,6 +28,8 @@
     .phone-btn { background:#22c55e; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:14px; }
     .nav-btn { background:#FF6A00; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:14px; }
     .checkStatusBtn { background:#FF8A33; border:none; color:#fff;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:14px; }
+    .lang-btn { background:transparent; border:1px solid #FF6A00; color:#FF6A00; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:14px; font-family:"楷体"; white-space:nowrap; }
+    .lang-btn:hover { background:#FFF5EE; }
     .source { margin-top:10px; color:#666; font-size:13px; }
     .note { margin-top:8px; color:#888; font-size:14px; }
     .statusBox { margin-top:8px;color:#888;font-size:14px; }
@@ -82,6 +84,7 @@
     <header>
       <button id="backBtn" class="back-btn">返回</button>
       <h1>招商银行深圳市外币兑换地图信息表</h1>
+      <button id="langBtn" class="lang-btn">EN</button>
     </header>
 
     <main>
@@ -96,14 +99,97 @@
   try {
     const data = {
       currencies: [
-        { id: "hk_us_eur_jpy", name: "港币 / 美元 / 欧元 / 日元", note: "深圳分行所有网点均可办理" },
-        { id: "aud_gbp", name: "澳大利亚元 / 英镑", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","水榭花都支行","滨河时代支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","前海分行营业部","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "cad", name: "加拿大元", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "sgd", name: "新加坡元（新元）", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "chf", name: "瑞士法郎", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行"] },
-        { id: "nzd", name: "新西兰元（纽元）", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深湾中心支行"] }
+        { id: "hk_us_eur_jpy", name: "港币 / 美元 / 欧元 / 日元", nameEn: "HKD / USD / EUR / JPY", note: "深圳分行所有网点均可办理", noteEn: "Available at all CMB Shenzhen branches" },
+        { id: "aud_gbp", name: "澳大利亚元 / 英镑", nameEn: "AUD / GBP", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","水榭花都支行","滨河时代支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","前海分行营业部","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "cad", name: "加拿大元", nameEn: "CAD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "sgd", name: "新加坡元（新元）", nameEn: "SGD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "chf", name: "瑞士法郎", nameEn: "CHF", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行"] },
+        { id: "nzd", name: "新西兰元（纽元）", nameEn: "NZD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深湾中心支行"] }
       ]
     };
+
+    // 多语言文本
+    const i18n = {
+      zh: {
+        appTitle: '招商银行深圳市外币兑换地图信息表',
+        back: '返回',
+        currencySelect: '币种选择',
+        notFound: '未找到该币种',
+        address: '地址',
+        phone: '联系方式',
+        hours: '营业时间',
+        source: '主要来源',
+        copyAddress: '复制地址',
+        copied: '已复制 ✓',
+        callPhone: '拨打电话',
+        navAmap: '高德导航',
+        checkStatus: '查看营业状态',
+        fetchBranchesError: '无法获取网点数据，请稍后重试。',
+        noLocation: '⚠️未获取到您的位置，无法计算距离，请允许位置权限。',
+        noLocationPerm: '无位置权限',
+        coordError: '坐标异常',
+        viewDetail: '查看详情',
+        disclaimer: '⚠️ 营业时间仅供参考。节假日、临时停业以招商银行官方公告及网点现场为准，建议电话确认。距离由地址解析计算得出，仅供参考。',
+        monFri: '周一 - 周五',
+        saturday: '周六',
+        sunday: '周日',
+        closed: '休息',
+        pleaseConfirm: '请致电或官网确认',
+        langLabel: 'EN'
+      },
+      en: {
+        appTitle: 'CMB Shenzhen Foreign Exchange Locator',
+        back: 'Back',
+        currencySelect: 'Select Currency',
+        notFound: 'Currency not found',
+        address: 'Address',
+        phone: 'Phone',
+        hours: 'Business Hours',
+        source: 'Source',
+        copyAddress: 'Copy Address',
+        copied: 'Copied ✓',
+        callPhone: 'Call',
+        navAmap: 'Navigate',
+        checkStatus: 'Check Status',
+        fetchBranchesError: 'Failed to load branch data. Please try again later.',
+        noLocation: '⚠️ Location access denied. Unable to calculate distance. Please enable location permission.',
+        noLocationPerm: 'No Location',
+        coordError: 'Coord Error',
+        viewDetail: 'View Details',
+        disclaimer: '⚠️ Business hours are for reference only. Holidays and temporary closures are subject to CMB official announcements. Please call to confirm. Distances are calculated from geocoded addresses for reference only.',
+        monFri: 'Mon - Fri',
+        saturday: 'Sat',
+        sunday: 'Sun',
+        closed: 'Closed',
+        pleaseConfirm: 'Call or check website',
+        langLabel: '中'
+      }
+    };
+
+    // 当前语言
+    let currentLang = localStorage.getItem('cmb_lang') || 'zh';
+
+    // 获取翻译文本
+    function t(key) {
+      return (i18n[currentLang] && i18n[currentLang][key]) || key;
+    }
+
+    // 切换语言
+    function toggleLang() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      localStorage.setItem('cmb_lang', currentLang);
+      updateLangUI();
+      router(); // 重新渲染当前页面
+    }
+
+    // 更新语言相关 UI
+    function updateLangUI() {
+      document.getElementById('langBtn').textContent = t('langLabel');
+      document.querySelector('header h1').textContent = t('appTitle');
+      document.getElementById('backBtn').textContent = t('back');
+      document.querySelector('.disclaimer-tip').textContent = t('disclaimer');
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+    }
 
     const root = document.getElementById('viewRoot');
     const backBtn = document.getElementById('backBtn');
@@ -146,12 +232,16 @@
     }
 
     window.addEventListener('hashchange', router);
-    window.addEventListener('load', router);
+    window.addEventListener('load', () => {
+      updateLangUI();
+      router();
+    });
 
     backBtn.addEventListener('click', () => {
       if (history.length > 1) history.back();
       else location.hash = '#/';
     });
+    document.getElementById('langBtn').addEventListener('click', toggleLang);
 
     function showBack(visible) { backBtn.style.display = visible ? 'inline-block' : 'none'; }
 
@@ -163,22 +253,22 @@
     }
 
     function formatHours(hours) {
-      if (!hours) return '请致电或官网确认';
+      if (!hours) return t('pleaseConfirm');
       const parts = [];
       if (hours.weekdays && hours.weekdays.open && hours.weekdays.close) {
-        parts.push(`周一 - 周五 ${hours.weekdays.open} - ${hours.weekdays.close}`);
+        parts.push(`${t('monFri')} ${hours.weekdays.open} - ${hours.weekdays.close}`);
       }
       if (hours.saturday && hours.saturday.open && hours.saturday.close) {
-        parts.push(`周六 ${hours.saturday.open} - ${hours.saturday.close}`);
+        parts.push(`${t('saturday')} ${hours.saturday.open} - ${hours.saturday.close}`);
       } else {
-        parts.push('周六 休息');
+        parts.push(`${t('saturday')} ${t('closed')}`);
       }
       if (hours.sunday && hours.sunday.open && hours.sunday.close) {
-        parts.push(`周日 ${hours.sunday.open} - ${hours.sunday.close}`);
+        parts.push(`${t('sunday')} ${hours.sunday.open} - ${hours.sunday.close}`);
       } else {
-        parts.push('周日 休息');
+        parts.push(`${t('sunday')} ${t('closed')}`);
       }
-      return parts.join('； ');
+      return currentLang === 'zh' ? parts.join('； ') : parts.join('; ');
     }
 
     function haversine(lat1, lon1, lat2, lon2) {
@@ -199,16 +289,16 @@
 
 
     function renderHome() {
-      document.title = '招商银行深圳市外币兑换地图信息表';
+      document.title = t('appTitle');
       root.innerHTML = '';
       const wrapper = document.createElement('div');
-      wrapper.innerHTML = `<div class="section-title">币种选择</div>`;
+      wrapper.innerHTML = `<div class="section-title">${t('currencySelect')}</div>`;
       const grid = document.createElement('div');
       grid.className = 'list';
       data.currencies.forEach(c => {
         const btn = document.createElement('button');
         btn.className = 'btn';
-        btn.textContent = c.name;
+        btn.textContent = currentLang === 'zh' ? c.name : (c.nameEn || c.name);
         btn.onclick = () => { location.hash = '#/currency/' + encodeURIComponent(c.id); };
         grid.appendChild(btn);
       });
@@ -223,14 +313,16 @@
       try{
         const cur = data.currencies.find(x => x.id === id);
         if (!cur) {
-          root.innerHTML = '<div class="section-title">未找到该币种</div>';
+          root.innerHTML = `<div class="section-title">${t('notFound')}</div>`;
           return;
         }
-        document.title = `招商银行 - ${cur.name}`;
-        root.innerHTML = `<div class="section-title">${escapeHtml(cur.name)}</div>`;
+        const curName = currentLang === 'zh' ? cur.name : (cur.nameEn || cur.name);
+        document.title = `CMB - ${curName}`;
+        root.innerHTML = `<div class="section-title">${escapeHtml(curName)}</div>`;
 
         if (cur.note) {
-          root.innerHTML += `<div class="detail"><div class="meta">${escapeHtml(cur.note)}</div></div>`;
+          const noteText = currentLang === 'zh' ? cur.note : (cur.noteEn || cur.note);
+          root.innerHTML += `<div class="detail"><div class="meta">${escapeHtml(noteText)}</div></div>`;
           return;
         }
 
@@ -242,7 +334,7 @@
           branchesData = j.branches;
         } catch (e) {
           console.error('fetch branches failed', e);
-          root.innerHTML += '<div class="note">无法获取网点数据，请稍后重试。</div>';
+          root.innerHTML += `<div class="note">${t('fetchBranchesError')}</div>`;
           return;
         }
 
@@ -279,7 +371,7 @@
         userPos = await getPositionPromise(8000);
 
         if(!userPos) {
-          root.innerHTML += `<div class="note">⚠️未获取到您的位置，无法计算距离，请允许位置权限。</div>`;
+          root.innerHTML += `<div class="note">${t('noLocation')}</div>`;
         }
 
         const enrichedItems = items.map(b => {
@@ -290,10 +382,10 @@
             item._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
           }else if(!userPos){
             item._distance_m = null;
-            item._distance_text = '无位置权限';
+            item._distance_text = t('noLocationPerm');
           }else{
             item._distance_m = null;
-            item._distance_text = '坐标异常';
+            item._distance_text = t('coordError');
           }
           return item;
         });
@@ -314,7 +406,7 @@
           left.innerHTML = `<div class="branch-name">${escapeHtml(b.name)}</div><div style="color:#666;font-size:14px;margin-top:6px">${escapeHtml(b.address)}</div>`;
           const right = document.createElement('div'); right.style.display='flex'; right.style.flexDirection='column'; right.style.alignItems='flex-end';
           right.innerHTML = `<div style="font-size:14px;color:#333;font-weight:600">${escapeHtml(b._distance_text)}</div>
-                             <div style="margin-top:8px;"><button class="action-btn" data-name="${encodeURIComponent(b.name)}">查看详情</button></div>`;
+                             <div style="margin-top:8px;"><button class="action-btn" data-name="${encodeURIComponent(b.name)}">${t('viewDetail')}</button></div>`;
           item.appendChild(left); item.appendChild(right); listEl.appendChild(item);
         });
 
@@ -332,7 +424,7 @@
     }
 
     async function renderBranch(name) {
-      document.title = `招商银行 - ${name || '网点详情'}`;
+      document.title = `CMB - ${name || 'Branch Details'}`;
       root.innerHTML = '';
       const wrapper = document.createElement('div');
       wrapper.className = 'container';
@@ -365,16 +457,16 @@
       card.innerHTML = `
         <h2>${escapeHtml(info.name)}</h2>
         <div class="meta">
-          <div><strong>地址：</strong><span>${escapeHtml(info.address)}</span></div>
-          <div><strong>联系方式：</strong>${escapeHtml(info.phone || '请致电95555或官网查询')}</div>
-          <div><strong>营业时间：</strong>${escapeHtml(formatHours(info.hours))}</div>
-          <div class="source"><strong>主要来源：</strong>${escapeHtml((info.source||[]).map(s=>s.title).join(' / '))}</div>
+          <div><strong>${t('address')}：</strong><span>${escapeHtml(info.address)}</span></div>
+          <div><strong>${t('phone')}：</strong>${escapeHtml(info.phone || '请致电95555或官网查询')}</div>
+          <div><strong>${t('hours')}：</strong>${escapeHtml(formatHours(info.hours))}</div>
+          <div class="source"><strong>${t('source')}：</strong>${escapeHtml((info.source||[]).map(s=>s.title).join(' / '))}</div>
         </div>
         <div class="row">
-          <button class="copy-btn">复制地址</button>
-          <button class="phone-btn">拨打电话</button>
-          <button class="nav-btn">高德导航</button>
-          <button class="checkStatusBtn">查看营业状态</button>
+          <button class="copy-btn">${t('copyAddress')}</button>
+          <button class="phone-btn">${t('callPhone')}</button>
+          <button class="nav-btn">${t('navAmap')}</button>
+          <button class="checkStatusBtn">${t('checkStatus')}</button>
         </div>
         ${(info.lat!=null && info.lng!=null) ? `<div style="margin-top:8px;color:#666;font-size:13px;">经度：${info.lng}，纬度：${info.lat}</div>` : ''}
         <div class="statusBox"></div>
@@ -385,7 +477,7 @@
       if (copyBtn) {
         copyBtn.addEventListener('click', async () => {
           const copyText = '招商银行' + info.name + '\n' + info.address;
-          try { await navigator.clipboard.writeText(copyText); copyBtn.textContent = '已复制 ✓'; setTimeout(()=>copyBtn.textContent='复制地址',1500); }
+          try { await navigator.clipboard.writeText(copyText); copyBtn.textContent = t('copied'); setTimeout(()=>copyBtn.textContent=t('copyAddress'),1500); }
           catch(e){ alert('复制失败，请手动复制：' + copyText); }
         });
       }
