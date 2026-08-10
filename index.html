@@ -89,7 +89,7 @@
       <div class="container" id="viewRoot"></div>
       <!-- ✅ 放在main内部，属于页面内容的一部分，随页面滚动到底部出现 -->
       <div class="disclaimer-tip">
-        ⚠️ 营业时间仅供参考。节假日、临时停业以招商银行官方公告及网点现场为准，建议电话确认。
+        ⚠️ 营业时间仅供参考。节假日、临时停业以招商银行官方公告及网点现场为准，建议电话确认。距离由地址解析计算得出，仅供参考。
       </div>
     </main>
   </div>
@@ -187,7 +187,27 @@
       return parts.join('； ');
     }
 
-    // Home: currency buttons
+    // Haversine 距离计算
+    function haversine(lat1, lon1, lat2, lon2) {
+      const toRad = x => x * Math.PI / 180;
+      const R = 6371000;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    // OSM Nominatim 公开地理编码：地址转经纬度，无密钥，有频率限制
+    async function geocodeAddress(address) {
+      const q = encodeURIComponent(address);
+      const resp = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1`);
+      const arr = await resp.json();
+      if(!arr || arr.length ===0) return null;
+      return { lat:parseFloat(arr[0].lat), lng:parseFloat(arr[0].lon) };
+    }
+
+    // Home: currency buttons 【已移除蓝色温馨提示】
     function renderHome() {
       document.title = '招商银行深圳市外币兑换地图信息表';
       root.innerHTML = '';
@@ -207,7 +227,7 @@
     }
 
     let renderCurrencyRunning = false;
-    // Render currency page: fetch branches, compute distances, sort, display
+    // Render currency page: fetch branches, geocode address for no‑latlng item, compute distances, sort, display
     async function renderCurrency(id) {
       if(renderCurrencyRunning) return;
       renderCurrencyRunning = true;
@@ -238,7 +258,7 @@
           return;
         }
 
-        // normalize name helper: remove zero-width / nbsp, collapse spaces, trim, lower
+        // normalize name helper: remove zero‑width / nbsp, collapse spaces, trim, lower
         const norm = s => s ? String(s).replace(/[\u200B\uFEFF\u00A0]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase() : '';
 
         // dedupe target names (normalize) and find matching branches by normalized name
@@ -275,30 +295,47 @@
 
         userPos = await getPositionPromise(8000);
 
-        // Haversine
-        function haversine(lat1, lon1, lat2, lon2) {
-          const toRad = x => x * Math.PI / 180;
-          const R = 6371000;
-          const dLat = toRad(lat2 - lat1);
-          const dLon = toRad(lon2 - lon1);
-          const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-          return R * c;
+        if(!userPos) {
+          root.innerHTML += `<div class="note">⚠️未获取到您的位置，无法计算距离，请允许位置权限。</div>`;
         }
 
-        items = items.map(b => {
-          if (userPos && isFinite(b.lat) && isFinite(b.lng)) {
-            const d = Math.round(haversine(userPos.lat, userPos.lng, b.lat, b.lng));
-            b._distance_m = d;
-            b._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
-          } else {
-            b._distance_m = null;
-            b._distance_text = '未知';
+        // 对缺少经纬度的网点，使用地址在线解析获取坐标
+        const enrichedItems = [];
+        for(const b of items){
+          let item = {...b};
+          if(userPos){
+            // 已有合法经纬度直接使用
+            if(isFinite(item.lat) && isFinite(item.lng)){
+              const d = Math.round(haversine(userPos.lat, userPos.lng, item.lat, item.lng));
+              item._distance_m = d;
+              item._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
+            }else{
+              // 无经纬度，调用地理编码解析地址
+              try{
+                const geo = await geocodeAddress(item.address);
+                if(geo){
+                  const d = Math.round(haversine(userPos.lat, userPos.lng, geo.lat, geo.lng));
+                  item._distance_m = d;
+                  item._distance_text = d < 1000 ? `${d} m` : `${(d/1000).toFixed(2)} km`;
+                }else{
+                  item._distance_m = null;
+                  item._distance_text = '解析失败';
+                }
+              }catch(err){
+                console.warn('地理编码失败',item.name,err);
+                item._distance_m = null;
+                item._distance_text = '解析失败';
+              }
+            }
+          }else{
+            item._distance_m = null;
+            item._distance_text = '无位置权限';
           }
-          return b;
-        });
+          enrichedItems.push(item);
+        }
 
-        items.sort((a,b) => {
+        // 排序，解析失败放最后
+        enrichedItems.sort((a,b) => {
           if (a._distance_m == null && b._distance_m == null) return 0;
           if (a._distance_m == null) return 1;
           if (b._distance_m == null) return -1;
@@ -307,7 +344,7 @@
 
         const listEl = document.createElement('div');
         listEl.className = 'list';
-        items.forEach(b => {
+        enrichedItems.forEach(b => {
           const item = document.createElement('div');
           item.className = 'branch-item';
           const left = document.createElement('div'); left.style.flex = '1';
@@ -394,19 +431,10 @@
       const navBtnEl = card.querySelector('.nav-btn');
       if (navBtnEl) {
         navBtnEl.addEventListener('click', () => {
-          // 注意：如果你的branches数据是GPS原始WGS84，coordinate改为 wgs84；高德火星坐标使用 gaode
-          const COORD_TYPE = "gaode";
-          const titleEnc = encodeURIComponent(info.name);
-          if (info.lng != null && info.lat != null) {
-            // 使用导航接口 navigation，直接进入路线规划，而不是marker仅查看点位
-            const uri = `https://uri.amap.com/navigation?to=${info.lng},${info.lat},${titleEnc}&mode=car&coordinate=${COORD_TYPE}&src=web_app&callnative=1`;
-            window.open(uri, '_blank');
-          } else {
-            // 无经纬度，降级地址搜索
-            const addrEnc = encodeURIComponent(info.address || info.name);
-            const uri = `https://uri.amap.com/search?query=${addrEnc}&src=web_app&callnative=1`;
-            window.open(uri, '_blank');
-          }
+          // 完全绕过经纬度，直接传入完整地址文本给高德导航接口 to=::地址
+          const addrEnc = encodeURIComponent(info.address);
+          const uri = `https://uri.amap.com/navigation?to=::${addrEnc}&mode=car&src=web_app&callnative=1`;
+          window.open(uri, '_blank');
         });
       }
 
