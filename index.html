@@ -391,8 +391,9 @@
       const navBtnEl = card.querySelector('.nav-btn');
       if (navBtnEl) {
         navBtnEl.addEventListener('click', () => {
-          const addrEnc = encodeURIComponent(info.address);
-          const uri = `https://uri.amap.com/navigation?to=::${addrEnc}&mode=car&src=web_app&callnative=1`;
+          const nameEnc = encodeURIComponent('招商银行' + info.name);
+          // 高德 URI 格式：to=经度,纬度,名称
+          const uri = `https://uri.amap.com/navigation?to=${info.lng},${info.lat},${nameEnc}&mode=car&src=webapp&callnative=1`;
           window.open(uri, '_blank');
         });
       }
