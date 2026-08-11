@@ -50,6 +50,61 @@
       .back-btn { display:inline-block; }
       .container { padding:0 8px; }
     }
+  
+    /* ===== 动态效果 ===== */
+    
+    /* 卡片悬停效果 */
+    .card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    /* 按钮过渡效果 */
+    .copy-btn, .phone-btn, .nav-btn, .checkStatusBtn, .lang-btn, .action-btn {
+      transition: all 0.2s ease;
+    }
+    .copy-btn:hover { background:#e8e8e8; }
+    .phone-btn:hover { background:#16a34a; transform: scale(1.03); }
+    .nav-btn:hover { background:#e55a00; transform: scale(1.03); }
+    .checkStatusBtn:hover { background:#f57c00; transform: scale(1.03); }
+    .lang-btn:hover { background:#FFF5EE; transform: scale(1.03); }
+    .action-btn:hover { background:#FFF5EE; transform: scale(1.02); }
+    
+    /* 币种选择按钮悬停 */
+    .currency-btn {
+      transition: all 0.2s ease;
+    }
+    .currency-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255,106,0,0.15);
+    }
+    
+    /* 页面淡入动画 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.25s ease-out;
+    }
+    
+    /* 营业状态呼吸灯 */
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .status-open {
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+    
+    /* 状态框淡入 */
+    .statusBox {
+      animation: fadeIn 0.3s ease-out;
+    }
+
   </style>
 </head>
 <body>
@@ -249,6 +304,10 @@
         showFatal(err.stack || err.message || err);
         try { renderHome(); showBack(false); } catch(e){}
       }
+      // 触发页面淡入动画
+      root.classList.remove('fade-in');
+      void root.offsetWidth;
+      root.classList.add('fade-in');
     }
 
     window.addEventListener('hashchange', router);
@@ -532,7 +591,7 @@
             if (!j.ok) { if (statusBoxEl) statusBoxEl.textContent = t('statusFailed'); console.error(j); return; }
             const wd = (j.now.weekdayKey && i18n[currentLang].weekday[j.now.weekdayKey]) || j.now.weekday;
             if (statusBoxEl) statusBoxEl.innerHTML = `<div>${t('currentTime')}: ${wd} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>
-                                 <div>${t('businessStatus')}: <strong style="color:${j.isOpen ? '#0a0' : '#a00'}">${j.isOpen ? t('statusOpen') : t('statusClosed')}</strong></div>
+                                 <div>${t('businessStatus')}: <strong style="color:${j.isOpen ? '#0a0' : '#a00'}" class="${j.isOpen ? 'status-open' : ''}">${j.isOpen ? t('statusOpen') : t('statusClosed')}</strong></div>
                                  <div>${t('todayHours')}: ${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : t('noSpecificHours')}</div>`;
           } catch (e) {
             if (statusBoxEl) statusBoxEl.textContent = t('statusError');
