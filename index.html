@@ -7,10 +7,10 @@
   <style>
     html,body { height:100%; margin:0; font-family:"楷体","KaiTi",serif; background:#ffffff; color:#222; font-size:16px; -webkit-font-smoothing:antialiased; }
     .app { display:flex; flex-direction:column; height:100vh; }
-    header { padding:12px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee; background:#fff; position:sticky; top:0; z-index:10; position:relative; min-height:60px; }
+    header { padding:8px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee; background:#fff; position:sticky; top:0; z-index:10; position:relative; }
     .back-btn { background:transparent; border:1px solid #FF6A00; color:#FF6A00; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:14px; display:none; position:absolute; left:16px; bottom:10px; z-index:20; }
     header h1 { margin:0; font-size:20px; font-family:"楷体"; color:#333; flex:1; text-align:center; }
-    main { flex:1; overflow:auto; padding:16px; box-sizing:border-box; min-height:0; }
+    main { flex:1; overflow:auto; padding:12px 16px; box-sizing:border-box; min-height:0; }
     .container { max-width:1100px; margin:0 auto; }
     .section-title { font-size:18px; margin:8px 0 12px 0; color:#333; font-family:"楷体"; }
     .btn { background:#FF6A00; color:#fff; border:none; padding:16px 20px; border-radius:14px; font-size:19px; font-weight:700; cursor:pointer; text-align:center; transition:transform .18s ease, box-shadow .18s; font-family:"楷体"; }
@@ -39,7 +39,7 @@
       font-size: 13px;
       color: #666666;
       line-height: 1.6;
-      padding: 12px 16px;
+      padding: 12px 80px 12px 16px;
       background-color: #f7f8fa;
       border-radius: 6px;
       margin: 24px 0 8px 0;
@@ -165,13 +165,13 @@
       align-items: center;
       justify-content: center;
       flex: 1;
-      padding: 8px 60px;
+      padding: 4px 60px;
       animation: headerMascotFloat 3s ease-in-out infinite;
     }
     .header-mascot {
-      width: 64px;
+      width: 50px;
       height: auto;
-      margin-bottom: -8px;
+      margin-bottom: -6px;
       position: relative;
       z-index: 5;
       pointer-events: none;
@@ -184,11 +184,11 @@
       background: #fff;
       border: 2px solid #FF6A00;
       border-radius: 10px;
-      padding: 12px 18px 10px;
+      padding: 8px 14px 6px;
       box-shadow: 0 2px 8px rgba(255,106,0,0.15);
       position: relative;
       z-index: 1;
-      max-width: 300px;
+      max-width: 280px;
     }
     .title-sign::before {
       content: '';
@@ -203,11 +203,11 @@
     }
     header h1 {
       margin: 0;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       text-align: center;
       color: #222;
-      line-height: 1.4;
+      line-height: 1.3;
     }
 
   
