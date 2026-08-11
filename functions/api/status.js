@@ -57,7 +57,7 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({
       ok: true,
       branch: { name: branch.name, address: branch.address, phone: branch.phone },
-      now: { timezone: 'Asia/Shanghai', weekday, hour, minute },
+      now: { timezone: 'Asia/Shanghai', weekday, weekdayKey: d, hour, minute },
       openPeriod,
       isOpen
     }), { headers: { 'content-type': 'application/json;charset=UTF-8', 'Access-Control-Allow-Origin': '*' }});
