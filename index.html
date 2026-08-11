@@ -200,35 +200,6 @@
     });
     console.log('Starting app (protected mode)...');
   
-    // 小招喵吉祥物交互
-    const mascotImages = ['/assets/3.jpg', '/assets/4.jpg', '/assets/1.jpg', '/assets/2.jpg', '/assets/6.jpg'];
-    const mascotMessages = {
-      zh: ['喵~ 有什么可以帮您？', '外币兑换找小招喵哦~', '点击查看营业状态！', '喵呜~ 祝您办理顺利！', '记得提前打电话确认哦~'],
-      en: ['Meow~ How can I help you?', 'Foreign exchange with CMB!', 'Check business status!', 'Meow~ Good luck!', 'Call to confirm first!']
-    };
-    let mascotIndex = 0;
-    
-    function toggleMascotExpression() {
-      const mascot = document.getElementById('mascotFixed');
-      const toast = document.getElementById('mascotToast');
-      if (!mascot || !toast) return;
-      
-      // 切换表情
-      mascotIndex = (mascotIndex + 1) % mascotImages.length;
-      mascot.src = mascotImages[mascotIndex];
-      
-      // 显示消息
-      const msgs = mascotMessages[currentLang] || mascotMessages.zh;
-      const msg = msgs[Math.floor(Math.random() * msgs.length)];
-      toast.textContent = msg;
-      toast.classList.add('show');
-      
-      // 3秒后隐藏
-      clearTimeout(window._mascotToastTimer);
-      window._mascotToastTimer = setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
 
   </script>
 
