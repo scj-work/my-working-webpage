@@ -135,7 +135,17 @@
         sunday: '周日',
         closed: '休息',
         pleaseConfirm: '请致电或官网确认',
-        langLabel: 'EN'
+        langLabel: 'EN',
+        statusLoading: '查询中...',
+        statusFailed: '状态查询失败',
+        statusError: '状态查询发生错误',
+        currentTime: '当前时间（Asia/Shanghai）',
+        businessStatus: '营业状态',
+        statusOpen: '营业中',
+        statusClosed: '已关闭',
+        todayHours: '今日时段',
+        noSpecificHours: '无明确时段',
+        weekday: { monday: '周一', tuesday: '周二', wednesday: '周三', thursday: '周四', friday: '周五', saturday: '周六', sunday: '周日' }
       },
       en: {
         appTitle: 'CMB Shenzhen Foreign Exchange Locator',
@@ -162,7 +172,17 @@
         sunday: 'Sun',
         closed: 'Closed',
         pleaseConfirm: 'Call or check website',
-        langLabel: '中'
+        langLabel: '中',
+        statusLoading: 'Loading...',
+        statusFailed: 'Status query failed',
+        statusError: 'Status query error',
+        currentTime: 'Current Time (Asia/Shanghai)',
+        businessStatus: 'Status',
+        statusOpen: 'Open',
+        statusClosed: 'Closed',
+        todayHours: "Today's Hours",
+        noSpecificHours: 'No specific hours',
+        weekday: { monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu', friday: 'Fri', saturday: 'Sat', sunday: 'Sun' }
       }
     };
 
@@ -505,16 +525,17 @@
       const checkStatusBtnEl = card.querySelector('.checkStatusBtn');
       if (checkStatusBtnEl) {
         checkStatusBtnEl.addEventListener('click', async () => {
-          if (statusBoxEl) statusBoxEl.textContent = '查询中...';
+          if (statusBoxEl) statusBoxEl.textContent = t('statusLoading');
           try {
             const r = await fetch('/api/status?branch=' + encodeURIComponent(info.name));
             const j = await r.json();
-            if (!j.ok) { if (statusBoxEl) statusBoxEl.textContent = '状态查询失败'; console.error(j); return; }
-            if (statusBoxEl) statusBoxEl.innerHTML = `<div>当前时间（Asia/Shanghai）：${j.now.weekday} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>
-                                 <div>营业状态：<strong style="color:${j.isOpen ? '#0a0' : '#a00'}">${j.isOpen ? '营业中' : '已关闭'}</strong></div>
-                                 <div>今日时段：${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : '无明确时段'}</div>`;
+            if (!j.ok) { if (statusBoxEl) statusBoxEl.textContent = t('statusFailed'); console.error(j); return; }
+            const wd = (j.now.weekdayKey && i18n[currentLang].weekday[j.now.weekdayKey]) || j.now.weekday;
+            if (statusBoxEl) statusBoxEl.innerHTML = `<div>${t('currentTime')}: ${wd} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>
+                                 <div>${t('businessStatus')}: <strong style="color:${j.isOpen ? '#0a0' : '#a00'}">${j.isOpen ? t('statusOpen') : t('statusClosed')}</strong></div>
+                                 <div>${t('todayHours')}: ${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : t('noSpecificHours')}</div>`;
           } catch (e) {
-            if (statusBoxEl) statusBoxEl.textContent = '状态查询发生错误';
+            if (statusBoxEl) statusBoxEl.textContent = t('statusError');
             console.error(e);
           }
         });
