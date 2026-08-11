@@ -210,6 +210,19 @@
       line-height: 1.4;
     }
 
+  
+    /* 右上角招商银行 logo 水印 */
+    .header-logo {
+      position: absolute;
+      right: 16px;
+      top: 8px;
+      width: 60px;
+      height: auto;
+      opacity: 0.85;
+      z-index: 15;
+      pointer-events: none;
+    }
+
   </style>
 </head>
 <body>
@@ -287,6 +300,7 @@
 
   <div class="app">
     <header>
+      <img src="/assets/cmb-logo.png" alt="招商银行" class="header-logo">
       <button id="backBtn" class="back-btn">返回</button>
       <div class="header-title-wrap">
         <img src="/assets/7.png" alt="小招喵" class="header-mascot">
