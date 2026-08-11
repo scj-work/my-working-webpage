@@ -403,7 +403,9 @@
           const item = document.createElement('div');
           item.className = 'branch-item';
           const left = document.createElement('div'); left.style.flex = '1';
-          left.innerHTML = `<div class="branch-name">${escapeHtml(b.name)}</div><div style="color:#666;font-size:14px;margin-top:6px">${escapeHtml(b.address)}</div>`;
+          const branchName = currentLang === 'zh' ? b.name : (b.nameEn || b.name);
+          const branchAddr = currentLang === 'zh' ? b.address : (b.addressEn || b.address);
+          left.innerHTML = `<div class="branch-name">${escapeHtml(branchName)}</div><div style="color:#666;font-size:14px;margin-top:6px">${escapeHtml(branchAddr)}</div>`;
           const right = document.createElement('div'); right.style.display='flex'; right.style.flexDirection='column'; right.style.alignItems='flex-end';
           right.innerHTML = `<div style="font-size:14px;color:#333;font-weight:600">${escapeHtml(b._distance_text)}</div>
                              <div style="margin-top:8px;"><button class="action-btn" data-name="${encodeURIComponent(b.name)}">${t('viewDetail')}</button></div>`;
@@ -455,9 +457,9 @@
       const card = document.createElement('div');
       card.className = 'detail';
       card.innerHTML = `
-        <h2>${escapeHtml(info.name)}</h2>
+        <h2>${escapeHtml(currentLang === 'zh' ? info.name : (info.nameEn || info.name))}</h2>
         <div class="meta">
-          <div><strong>${t('address')}：</strong><span>${escapeHtml(info.address)}</span></div>
+          <div><strong>${t('address')}：</strong><span>${escapeHtml(currentLang === 'zh' ? info.address : (info.addressEn || info.address))}</span></div>
           <div><strong>${t('phone')}：</strong>${escapeHtml(info.phone || '请致电95555或官网查询')}</div>
           <div><strong>${t('hours')}：</strong>${escapeHtml(formatHours(info.hours))}</div>
           <div class="source"><strong>${t('source')}：</strong>${escapeHtml((info.source||[]).map(s=>s.title).join(' / '))}</div>
