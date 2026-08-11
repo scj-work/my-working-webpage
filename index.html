@@ -697,7 +697,6 @@
           <div><strong>${t('address')}：</strong><span>${escapeHtml(currentLang === 'zh' ? info.address : (info.addressEn || info.address))}</span></div>
           <div><strong>${t('phone')}：</strong>${escapeHtml(info.phone || '请致电95555或官网查询')}</div>
           <div><strong>${t('hours')}：</strong>${escapeHtml(formatHours(info.hours))}</div>
-          <div class="source"><strong>${t('source')}：</strong>${escapeHtml((info.source||[]).map(s=>s.title).join(' / '))}</div>
         </div>
         <div class="row">
           <button class="copy-btn">${t('copyAddress')}</button>
@@ -705,7 +704,6 @@
           <button class="nav-btn">${t('navAmap')}</button>
           <button class="checkStatusBtn">${t('checkStatus')}</button>
         </div>
-        ${(info.lat!=null && info.lng!=null) ? `<div style="margin-top:8px;color:#666;font-size:13px;">经度：${info.lng}，纬度：${info.lat}</div>` : ''}
         <div class="statusBox"></div>
       `;
       wrapper.appendChild(card);
