@@ -105,6 +105,72 @@
       animation: fadeIn 0.3s ease-out;
     }
 
+  
+    /* ===== 小招喵吉祥物 ===== */
+    .mascot-welcome {
+      display: block;
+      margin: 0 auto 16px;
+      width: 120px;
+      height: auto;
+      mix-blend-mode: multiply;
+      animation: mascotFloat 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes mascotFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    /* 右下角固定吉祥物 */
+    .mascot-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      z-index: 1000;
+      mix-blend-mode: multiply;
+      animation: mascotSwing 2s ease-in-out infinite;
+      transition: transform 0.2s ease;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+    }
+    .mascot-fixed:hover {
+      transform: scale(1.15);
+      animation-play-state: paused;
+    }
+    .mascot-fixed:active {
+      transform: scale(0.95);
+    }
+    @keyframes mascotSwing {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+    
+    /* 吉祥物点击彩蛋 */
+    .mascot-toast {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: #fff;
+      border: 1px solid #FF6A00;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 14px;
+      color: #333;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 1001;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+      max-width: 200px;
+    }
+    .mascot-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
   </style>
 </head>
 <body>
@@ -133,6 +199,37 @@
       showFatal(e.reason ? (e.reason.stack || e.reason.message || e.reason) : String(e));
     });
     console.log('Starting app (protected mode)...');
+  
+    // 小招喵吉祥物交互
+    const mascotImages = ['/assets/3.jpg', '/assets/4.jpg', '/assets/1.jpg', '/assets/2.jpg', '/assets/6.jpg'];
+    const mascotMessages = {
+      zh: ['喵~ 有什么可以帮您？', '外币兑换找小招喵哦~', '点击查看营业状态！', '喵呜~ 祝您办理顺利！', '记得提前打电话确认哦~'],
+      en: ['Meow~ How can I help you?', 'Foreign exchange with CMB!', 'Check business status!', 'Meow~ Good luck!', 'Call to confirm first!']
+    };
+    let mascotIndex = 0;
+    
+    function toggleMascotExpression() {
+      const mascot = document.getElementById('mascotFixed');
+      const toast = document.getElementById('mascotToast');
+      if (!mascot || !toast) return;
+      
+      // 切换表情
+      mascotIndex = (mascotIndex + 1) % mascotImages.length;
+      mascot.src = mascotImages[mascotIndex];
+      
+      // 显示消息
+      const msgs = mascotMessages[currentLang] || mascotMessages.zh;
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+      toast.textContent = msg;
+      toast.classList.add('show');
+      
+      // 3秒后隐藏
+      clearTimeout(window._mascotToastTimer);
+      window._mascotToastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
   </script>
 
   <div class="app">
@@ -371,7 +468,7 @@
       document.title = t('appTitle');
       root.innerHTML = '';
       const wrapper = document.createElement('div');
-      wrapper.innerHTML = `<div class="section-title">${t('currencySelect')}</div>`;
+      wrapper.innerHTML = `<img src="/assets/5.jpg" alt="小招喵" class="mascot-welcome"><div class="section-title">${t('currencySelect')}</div>`;
       const grid = document.createElement('div');
       grid.className = 'list';
       data.currencies.forEach(c => {
@@ -605,7 +702,42 @@
     console.error('Fatal error initializing app', err);
     try { showFatal(err.stack || err.message || err); } catch(e){}
   }
+  
+    // 小招喵吉祥物交互
+    const mascotImages = ['/assets/3.jpg', '/assets/4.jpg', '/assets/1.jpg', '/assets/2.jpg', '/assets/6.jpg'];
+    const mascotMessages = {
+      zh: ['喵~ 有什么可以帮您？', '外币兑换找小招喵哦~', '点击查看营业状态！', '喵呜~ 祝您办理顺利！', '记得提前打电话确认哦~'],
+      en: ['Meow~ How can I help you?', 'Foreign exchange with CMB!', 'Check business status!', 'Meow~ Good luck!', 'Call to confirm first!']
+    };
+    let mascotIndex = 0;
+    
+    function toggleMascotExpression() {
+      const mascot = document.getElementById('mascotFixed');
+      const toast = document.getElementById('mascotToast');
+      if (!mascot || !toast) return;
+      
+      // 切换表情
+      mascotIndex = (mascotIndex + 1) % mascotImages.length;
+      mascot.src = mascotImages[mascotIndex];
+      
+      // 显示消息
+      const msgs = mascotMessages[currentLang] || mascotMessages.zh;
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+      toast.textContent = msg;
+      toast.classList.add('show');
+      
+      // 3秒后隐藏
+      clearTimeout(window._mascotToastTimer);
+      window._mascotToastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
   </script>
+
+  <!-- 右下角小招喵吉祥物 -->
+  <img src="/assets/3.jpg" alt="小招喵" class="mascot-fixed" id="mascotFixed" onclick="toggleMascotExpression()">
+  <div class="mascot-toast" id="mascotToast"></div>
 
 </body>
 </html>
