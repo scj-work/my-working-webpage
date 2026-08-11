@@ -217,6 +217,18 @@
       toast.classList.remove('show');
     }, 3000);
   }
+  
+  // 绑定小招喵点击事件（兼容安卓触摸）
+  document.addEventListener('DOMContentLoaded', function() {
+    const mascot = document.getElementById('mascotFixed');
+    if (mascot) {
+      mascot.addEventListener('click', toggleMascotExpression);
+      mascot.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        toggleMascotExpression();
+      }, { passive: false });
+    }
+  });
 
   </script>
 
@@ -695,7 +707,7 @@
   </script>
 
   <!-- 右下角小招喵吉祥物 -->
-  <img src="/assets/3.png" alt="小招喵" class="mascot-fixed" id="mascotFixed" onclick="toggleMascotExpression()">
+  <img src="/assets/3.png" alt="小招喵" class="mascot-fixed" id="mascotFixed">
   <div class="mascot-toast" id="mascotToast"></div>
 
 </body>
