@@ -158,17 +158,18 @@
     }
 
   
-    /* 标题小招喵 */
+    /* 标题小招喵举牌子 */
     .header-title-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
       flex: 1;
+      padding: 8px 0;
     }
     .header-mascot {
-      width: 70px;
+      width: 64px;
       height: auto;
-      margin-bottom: -18px;
+      margin-bottom: -28px;
       position: relative;
       z-index: 5;
       animation: headerMascotFloat 3s ease-in-out infinite;
@@ -176,13 +177,36 @@
     }
     @keyframes headerMascotFloat {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+      50% { transform: translateY(-3px); }
+    }
+    .title-sign {
+      background: #fff;
+      border: 2px solid #FF6A00;
+      border-radius: 10px;
+      padding: 10px 16px 8px;
+      box-shadow: 0 2px 8px rgba(255,106,0,0.15);
+      position: relative;
+      z-index: 1;
+      max-width: 280px;
+    }
+    .title-sign::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 4px;
+      background: #FF6A00;
+      border-radius: 2px;
     }
     header h1 {
       margin: 0;
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
       text-align: center;
+      color: #333;
+      line-height: 1.4;
     }
 
   </style>
@@ -265,7 +289,9 @@
       <button id="backBtn" class="back-btn">返回</button>
       <div class="header-title-wrap">
         <img src="/assets/7.png" alt="小招喵" class="header-mascot">
-        <h1>招商银行深圳市外币兑换地图信息表</h1>
+        <div class="title-sign">
+          <h1>招商银行深圳市外币兑换地图信息表</h1>
+        </div>
       </div>
       <button id="langBtn" class="lang-btn">EN</button>
     </header>
