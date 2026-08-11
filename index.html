@@ -107,20 +107,7 @@
 
   
     /* ===== 小招喵吉祥物 ===== */
-    .mascot-welcome {
-      display: block;
-      margin: 0 auto 16px;
-      width: 120px;
-      height: auto;
-      mix-blend-mode: multiply;
-      animation: mascotFloat 3s ease-in-out infinite;
-      pointer-events: none;
-    }
-    @keyframes mascotFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-    
+
     /* 右下角固定吉祥物 */
     .mascot-fixed {
       position: fixed;
@@ -130,7 +117,6 @@
       height: 60px;
       cursor: pointer;
       z-index: 1000;
-      mix-blend-mode: multiply;
       animation: mascotSwing 2s ease-in-out infinite;
       transition: transform 0.2s ease;
       filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
@@ -439,7 +425,7 @@
       document.title = t('appTitle');
       root.innerHTML = '';
       const wrapper = document.createElement('div');
-      wrapper.innerHTML = `<img src="/assets/5.jpg" alt="小招喵" class="mascot-welcome"><div class="section-title">${t('currencySelect')}</div>`;
+      wrapper.innerHTML = `<div class="section-title">${t('currencySelect')}</div>`;
       const grid = document.createElement('div');
       grid.className = 'list';
       data.currencies.forEach(c => {
@@ -675,7 +661,7 @@
   }
   
     // 小招喵吉祥物交互
-    const mascotImages = ['/assets/3.jpg', '/assets/4.jpg', '/assets/1.jpg', '/assets/2.jpg', '/assets/6.jpg'];
+    const mascotImages = ['/assets/3.png', '/assets/4.png'];
     const mascotMessages = {
       zh: ['喵~ 有什么可以帮您？', '外币兑换找小招喵哦~', '点击查看营业状态！', '喵呜~ 祝您办理顺利！', '记得提前打电话确认哦~'],
       en: ['Meow~ How can I help you?', 'Foreign exchange with CMB!', 'Check business status!', 'Meow~ Good luck!', 'Call to confirm first!']
@@ -707,7 +693,7 @@
   </script>
 
   <!-- 右下角小招喵吉祥物 -->
-  <img src="/assets/3.jpg" alt="小招喵" class="mascot-fixed" id="mascotFixed" onclick="toggleMascotExpression()">
+  <img src="/assets/3.png" alt="小招喵" class="mascot-fixed" id="mascotFixed" onclick="toggleMascotExpression()">
   <div class="mascot-toast" id="mascotToast"></div>
 
 </body>
