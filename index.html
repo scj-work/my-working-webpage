@@ -36,13 +36,13 @@
   const mascotMessages = {
     zh: {
       home: ['选个币种吧～', '喵~ 想换什么外币呢？', '外币兑换找小招喵哦~'],
-      currency: ['选个网点去看看～', '喵~ 挑个最近的网点吧', '记得点击查看营业状态哦~'],
+      currency: ['选个网点去看看～', '喵~ 挑个最近的网点吧！', '记得点击查看营业状态哦~'],
       branch: ['记得提前打电话哦～', '喵呜~ 祝您办理顺利！', '营业时间仅供参考，建议电话确认']
     },
     en: {
-      home: ['Choose a currency~', 'Meow~ What currency?', 'Foreign Currency Exchange at CMB!'],
-      currency: ['Pick a branch~', 'Meow~ Choose the nearest!', 'Remember to check business status!'],
-      branch: ['Call to confirm first~', 'Meow~ Have a nice day!', 'Hours are for reference only']
+      home: ['Choose a currency~', 'Meow~ What currency do you want to exchange?', 'Foreign Currency Exchange at CMB!'],
+      currency: ['Pick a branch~', 'Meow~ Choose the nearest branch!', 'Remember to check business status!'],
+      branch: ['Call to confirm first~', 'Meow~ Have a nice day!', 'Business hours are for reference only~']
     }
   };
   // let mascotIndex = 0; // 表情切换已停用
@@ -490,6 +490,18 @@
         });
       }finally{
         renderCurrencyRunning = false;
+        // 自动弹出小招喵提示：下拉可以刷新
+        setTimeout(() => {
+          const toast = document.getElementById('mascotToast');
+          if (toast) {
+            toast.textContent = currentLang === 'zh' ? '下拉可以刷新网点哦~' : 'Pull down to refresh~';
+            toast.classList.add('show');
+            clearTimeout(window._autoTipTimer);
+            window._autoTipTimer = setTimeout(() => {
+              toast.classList.remove('show');
+            }, 3000);
+          }
+        }, 500);
       }
     }
     async function renderBranch(name) {
