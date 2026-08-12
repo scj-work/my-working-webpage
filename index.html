@@ -5,15 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>招商银行深圳市外币兑换地图信息表</title>
   <style>
-    html,body { height:100%; margin:0; font-family:"楷体","KaiTi",serif; background:#ffffff; color:#222; font-size:16px; -webkit-font-smoothing:antialiased; }
+    html,body { height:100%; margin:0; font-family:"楷体","KaiTi",serif; background:linear-gradient(180deg, #FFF5EE 0%, #FFFFFF 25%); background-attachment:fixed; color:#222; font-size:16px; -webkit-font-smoothing:antialiased; }
     .app { display:flex; flex-direction:column; height:100vh; }
     header { padding:8px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee; background:#fff; position:sticky; top:0; z-index:10; position:relative; }
     .back-btn { background:transparent; border:1px solid #FF6A00; color:#FF6A00; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:14px; display:none; position:absolute; left:16px; bottom:10px; z-index:20; }
     header h1 { margin:0; font-size:20px; font-family:"楷体"; color:#333; flex:1; text-align:center; }
-    main { flex:1; overflow:auto; padding:12px 16px; box-sizing:border-box; min-height:0; }
+    main { flex:1; overflow:auto; padding:12px 16px; box-sizing:border-box; min-height:0; position:relative; }
+    .pull-refresh { position:absolute; top:0; left:0; right:0; display:flex; flex-direction:column; align-items:center; justify-content:center; height:0; overflow:hidden; transition:height 0.2s ease; background:transparent; z-index:5; }
+    .pull-refresh.show { height:80px; }
+    .pull-refresh img { width:50px; height:50px; }
+    .pull-refresh-text { font-size:12px; color:#999; margin-top:4px; }
     .container { max-width:1100px; margin:0 auto; }
     .section-title { font-size:18px; margin:8px 0 12px 0; color:#333; font-family:"楷体"; }
-    .btn { background:#FF6A00; color:#fff; border:none; padding:16px 20px; border-radius:14px; font-size:19px; font-weight:700; cursor:pointer; text-align:center; transition:transform .18s ease, box-shadow .18s; font-family:"楷体"; }
+    .btn { background:#FF6A00; color:#fff; border:none; padding:16px 20px; border-radius:14px; font-size:19px; font-weight:700; cursor:pointer; text-align:center; transition:transform .18s ease, box-shadow .18s; font-family:"楷体"; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .currency-icon { font-size:22px; letter-spacing:2px; }
     .btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(255,106,0,0.25); }
     .list { display:flex; flex-direction:column; gap:8px; }
     .branch-item { display:flex; justify-content:space-between; align-items:center; gap:8px; background:#fff; border:1px solid #f0f0f0; padding:12px; border-radius:6px; }
@@ -247,8 +252,16 @@
   // 表情切换已停用，使用 GIF 动图
   // const mascotImages = ['/assets/3.png', '/assets/4.png'];
   const mascotMessages = {
-    zh: ['喵~ 有什么可以帮您？', '外币兑换找小招喵哦~', '记得点击查看营业状态哦~', '喵呜~ 祝您办理顺利！', '记得提前打电话确认哦~'],
-    en: ['Meow~ How can I help you?', 'Foreign Currency Exchange at CMB!', 'Remember to check business status!', 'Meow~ Have a nice day!', 'Call to confirm first!']
+    zh: {
+      home: ['选个币种吧～', '喵~ 想换什么外币呢？', '外币兑换找小招喵哦~'],
+      currency: ['选个网点去看看～', '喵~ 挑个最近的网点吧', '记得点击查看营业状态哦~'],
+      branch: ['记得提前打电话哦～', '喵呜~ 祝您办理顺利！', '营业时间仅供参考，建议电话确认']
+    },
+    en: {
+      home: ['Choose a currency~', 'Meow~ What currency?', 'Foreign Currency Exchange at CMB!'],
+      currency: ['Pick a branch~', 'Meow~ Choose the nearest!', 'Remember to check business status!'],
+      branch: ['Call to confirm first~', 'Meow~ Have a nice day!', 'Hours are for reference only']
+    }
   };
   // let mascotIndex = 0; // 表情切换已停用
   
@@ -258,7 +271,13 @@
     
     // 从 localStorage 读取当前语言
     const lang = localStorage.getItem('cmb_lang') || 'zh';
-    const msgs = mascotMessages[lang] || mascotMessages.zh;
+    // 根据当前页面选择不同的消息
+    const hash = location.hash || '';
+    let pageType = 'home';
+    if (hash.startsWith('#/currency/')) pageType = 'currency';
+    else if (hash.startsWith('#/branch/')) pageType = 'branch';
+    const pageMsgs = mascotMessages[lang] ? mascotMessages[lang][pageType] : null;
+    const msgs = pageMsgs || mascotMessages.zh.home;
     const msg = msgs[Math.floor(Math.random() * msgs.length)];
     toast.textContent = msg;
     toast.classList.add('show');
@@ -296,7 +315,11 @@
       <button id="langBtn" class="lang-btn">EN</button>
     </header>
 
-    <main>
+    <main id="mainContent">
+      <div class="pull-refresh" id="pullRefresh">
+        <img src="/assets/fighting.gif" alt="刷新中">
+        <div class="pull-refresh-text" id="pullRefreshText">下拉刷新</div>
+      </div>
       <div class="container" id="viewRoot"></div>
       <div class="disclaimer-tip" id="disclaimerTip">
         ⚠️ 营业时间仅供参考。节假日、临时停业以招商银行官方公告及网点现场为准，建议电话确认。距离由地址解析计算得出，仅供参考。
@@ -316,12 +339,12 @@
     }
     const data = {
       currencies: [
-        { id: "hk_us_eur_jpy", name: "港币 / 美元 / 欧元 / 日元", nameEn: "HKD / USD / EUR / JPY", note: "深圳分行所有网点均可办理", noteEn: "Available at all CMB Shenzhen branches" },
-        { id: "aud_gbp", name: "澳大利亚元 / 英镑", nameEn: "AUD / GBP", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","水榭花都支行","滨河时代支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","前海分行营业部","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "cad", name: "加拿大元", nameEn: "CAD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "sgd", name: "新加坡元（新元）", nameEn: "SGD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "chf", name: "瑞士法郎", nameEn: "CHF", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行"] },
-        { id: "nzd", name: "新西兰元（纽元）", nameEn: "NZD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深湾中心支行"] }
+        { id: "hk_us_eur_jpy", icon: "🇭🇰🇺🇸🇪🇺🇯🇵", name: "港币 / 美元 / 欧元 / 日元", nameEn: "HKD / USD / EUR / JPY", note: "深圳分行所有网点均可办理", noteEn: "Available at all CMB Shenzhen branches" },
+        { id: "aud_gbp", icon: "🇦🇺🇬🇧", name: "澳大利亚元 / 英镑", nameEn: "AUD / GBP", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","水榭花都支行","滨河时代支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","前海分行营业部","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "cad", icon: "🇨🇦", name: "加拿大元", nameEn: "CAD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "sgd", icon: "🇸🇬", name: "新加坡元（新元）", nameEn: "SGD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "chf", icon: "🇨🇭", name: "瑞士法郎", nameEn: "CHF", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行"] },
+        { id: "nzd", icon: "🇳🇿", name: "新西兰元（纽元）", nameEn: "NZD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深湾中心支行"] }
       ]
     };
 
@@ -483,7 +506,72 @@
     window.addEventListener('load', () => {
       updateLangUI();
       router();
+      initPullRefresh();
     });
+
+    // 下拉刷新功能
+    let pullStartY = 0;
+    let pullDistance = 0;
+    let isPulling = false;
+    let isRefreshing = false;
+    const PULL_THRESHOLD = 60;
+
+    function initPullRefresh() {
+      const mainEl = document.getElementById('mainContent');
+      const pullEl = document.getElementById('pullRefresh');
+      const pullText = document.getElementById('pullRefreshText');
+      if (!mainEl || !pullEl) return;
+
+      mainEl.addEventListener('touchstart', (e) => {
+        // 只在币种列表页生效
+        if (!location.hash.startsWith('#/currency/')) return;
+        if (isRefreshing) return;
+        if (mainEl.scrollTop > 0) return;
+        pullStartY = e.touches[0].clientY;
+        isPulling = true;
+        pullDistance = 0;
+      }, { passive: true });
+
+      mainEl.addEventListener('touchmove', (e) => {
+        if (!isPulling || isRefreshing) return;
+        const currentY = e.touches[0].clientY;
+        pullDistance = currentY - pullStartY;
+        if (pullDistance > 0 && mainEl.scrollTop <= 0) {
+          e.preventDefault();
+          const height = Math.min(pullDistance * 0.5, 100);
+          pullEl.style.height = height + 'px';
+          pullEl.style.transition = 'none';
+          if (pullText) {
+            pullText.textContent = pullDistance > PULL_THRESHOLD ? '释放刷新' : '下拉刷新';
+          }
+        }
+      }, { passive: false });
+
+      mainEl.addEventListener('touchend', () => {
+        if (!isPulling || isRefreshing) return;
+        isPulling = false;
+        pullEl.style.transition = 'height 0.3s ease';
+        
+        if (pullDistance > PULL_THRESHOLD) {
+          // 触发刷新
+          isRefreshing = true;
+          pullEl.style.height = '80px';
+          if (pullText) pullText.textContent = '刷新中...';
+          // 重新渲染当前页面
+          setTimeout(() => {
+            router();
+            setTimeout(() => {
+              pullEl.style.height = '0';
+              isRefreshing = false;
+              pullDistance = 0;
+            }, 500);
+          }, 800);
+        } else {
+          pullEl.style.height = '0';
+          pullDistance = 0;
+        }
+      });
+    }
 
     backBtn.addEventListener('click', () => {
       if (history.length > 1) history.back();
@@ -546,7 +634,8 @@
       data.currencies.forEach(c => {
         const btn = document.createElement('button');
         btn.className = 'btn';
-        btn.textContent = currentLang === 'zh' ? c.name : (c.nameEn || c.name);
+        const icon = c.icon ? `<span class="currency-icon">${c.icon}</span> ` : '';
+        btn.innerHTML = icon + (currentLang === 'zh' ? c.name : (c.nameEn || c.name));
         btn.onclick = () => { location.hash = '#/currency/' + encodeURIComponent(c.id); };
         grid.appendChild(btn);
       });
@@ -751,9 +840,43 @@
             const j = await r.json();
             if (!j.ok) { if (statusBoxEl) statusBoxEl.textContent = t('statusFailed'); console.error(j); return; }
             const wd = (j.now.weekdayKey && i18n[currentLang].weekday[j.now.weekdayKey]) || j.now.weekday;
-            if (statusBoxEl) statusBoxEl.innerHTML = `<div>${t('currentTime')}: ${wd} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>
+            if (statusBoxEl) {
+              let countdownHtml = '';
+              if (j.isOpen && j.openPeriod && j.openPeriod.close) {
+                countdownHtml = `<div id="countdownBox" style="color:#FF6A00;font-weight:bold;margin-top:4px;"></div>`;
+              }
+              statusBoxEl.innerHTML = `<div>${t('currentTime')}: ${wd} ${String(j.now.hour).padStart(2,'0')}:${String(j.now.minute).padStart(2,'0')}</div>
                                  <div>${t('businessStatus')}: <strong style="color:${j.isOpen ? '#0a0' : '#a00'}" class="${j.isOpen ? 'status-open' : ''}">${j.isOpen ? t('statusOpen') : t('statusClosed')}</strong></div>
-                                 <div>${t('todayHours')}: ${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : t('noSpecificHours')}</div>`;
+                                 <div>${t('todayHours')}: ${j.openPeriod ? (j.openPeriod.open + ' - ' + j.openPeriod.close) : t('noSpecificHours')}</div>
+                                 ${countdownHtml}`;
+              // 启动倒计时
+              if (j.isOpen && j.openPeriod && j.openPeriod.close) {
+                const closeParts = j.openPeriod.close.split(':');
+                const closeHour = parseInt(closeParts[0]) || 17;
+                const closeMin = parseInt(closeParts[1]) || 0;
+                function updateCountdown() {
+                  const now = new Date();
+                  const closeTime = new Date();
+                  closeTime.setHours(closeHour, closeMin, 0, 0);
+                  let diff = closeTime - now;
+                  const cdEl = document.getElementById('countdownBox');
+                  if (!cdEl) return;
+                  if (diff <= 0) {
+                    cdEl.textContent = currentLang === 'zh' ? '即将下班，请尽快办理' : 'Closing soon';
+                    return;
+                  }
+                  const hours = Math.floor(diff / 3600000);
+                  const mins = Math.floor((diff % 3600000) / 60000);
+                  const secs = Math.floor((diff % 60000) / 1000);
+                  cdEl.textContent = (currentLang === 'zh' ? '距离下班还有 ' : 'Closes in ') + hours + 'h ' + mins + 'm ' + secs + 's';
+                }
+                updateCountdown();
+                if (window._countdownTimer) clearInterval(window._countdownTimer);
+                window._countdownTimer = setInterval(updateCountdown, 1000);
+              } else {
+                if (window._countdownTimer) { clearInterval(window._countdownTimer); window._countdownTimer = null; }
+              }
+            }
           } catch (e) {
             if (statusBoxEl) statusBoxEl.textContent = t('statusError');
             console.error(e);
