@@ -118,15 +118,14 @@
       cursor: pointer;
       z-index: 1000;
       animation: mascotSwing 2s ease-in-out infinite;
-      transition: transform 0.2s ease;
       filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+      -webkit-tap-highlight-color: transparent;
     }
     .mascot-fixed:hover {
-      transform: scale(1.15);
       animation-play-state: paused;
     }
     .mascot-fixed:active {
-      transform: scale(0.95);
+      opacity: 0.8;
     }
     @keyframes mascotSwing {
       0%, 100% { transform: rotate(-5deg); }
