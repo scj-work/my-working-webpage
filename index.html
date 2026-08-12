@@ -17,8 +17,7 @@
     .pull-refresh-text { font-size:12px; color:#999; margin-top:4px; }
     .container { max-width:1100px; margin:0 auto; }
     .section-title { font-size:18px; margin:8px 0 12px 0; color:#333; font-family:"楷体"; }
-    .btn { background:#FF6A00; color:#fff; border:none; padding:16px 20px; border-radius:14px; font-size:19px; font-weight:700; cursor:pointer; text-align:center; transition:transform .18s ease, box-shadow .18s; font-family:"楷体"; display:flex; align-items:center; justify-content:center; gap:8px; }
-    .currency-icon { font-size:22px; letter-spacing:2px; }
+    .btn { background:#FF6A00; color:#fff; border:none; padding:16px 20px; border-radius:14px; font-size:19px; font-weight:700; cursor:pointer; text-align:center; transition:transform .18s ease, box-shadow .18s; font-family:"楷体"; }
     .btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(255,106,0,0.25); }
     .list { display:flex; flex-direction:column; gap:8px; }
     .branch-item { display:flex; justify-content:space-between; align-items:center; gap:8px; background:#fff; border:1px solid #f0f0f0; padding:12px; border-radius:6px; }
@@ -339,12 +338,12 @@
     }
     const data = {
       currencies: [
-        { id: "hk_us_eur_jpy", icon: "🇭🇰🇺🇸🇪🇺🇯🇵", name: "港币 / 美元 / 欧元 / 日元", nameEn: "HKD / USD / EUR / JPY", note: "深圳分行所有网点均可办理", noteEn: "Available at all CMB Shenzhen branches" },
-        { id: "aud_gbp", icon: "🇦🇺🇬🇧", name: "澳大利亚元 / 英镑", nameEn: "AUD / GBP", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","水榭花都支行","滨河时代支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","前海分行营业部","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "cad", icon: "🇨🇦", name: "加拿大元", nameEn: "CAD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "sgd", icon: "🇸🇬", name: "新加坡元（新元）", nameEn: "SGD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
-        { id: "chf", icon: "🇨🇭", name: "瑞士法郎", nameEn: "CHF", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行"] },
-        { id: "nzd", icon: "🇳🇿", name: "新西兰元（纽元）", nameEn: "NZD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深湾中心支行"] }
+        { id: "hk_us_eur_jpy", name: "港币 / 美元 / 欧元 / 日元", nameEn: "HKD / USD / EUR / JPY", note: "深圳分行所有网点均可办理", noteEn: "Available at all CMB Shenzhen branches" },
+        { id: "aud_gbp", name: "澳大利亚元 / 英镑", nameEn: "AUD / GBP", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","水榭花都支行","滨河时代支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","前海分行营业部","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "cad", name: "加拿大元", nameEn: "CAD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","波托菲诺支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "sgd", name: "新加坡元（新元）", nameEn: "SGD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深纺大厦支行","皇岗支行","中央商务支行","香蜜湖支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行","高新园科创支行","龙华支行","新时代支行","上步支行","金丰城支行","福强支行"] },
+        { id: "chf", name: "瑞士法郎", nameEn: "CHF", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","华侨城支行","南山科创支行","盐田支行","布吉支行","深湾中心支行"] },
+        { id: "nzd", name: "新西兰元（纽元）", nameEn: "NZD", branches: ["深圳分行营业部","蛇口支行","罗湖支行","建安支行","深湾中心支行"] }
       ]
     };
 
@@ -634,8 +633,7 @@
       data.currencies.forEach(c => {
         const btn = document.createElement('button');
         btn.className = 'btn';
-        const icon = c.icon ? `<span class="currency-icon">${c.icon}</span> ` : '';
-        btn.innerHTML = icon + (currentLang === 'zh' ? c.name : (c.nameEn || c.name));
+        btn.textContent = currentLang === 'zh' ? c.name : (c.nameEn || c.name);
         btn.onclick = () => { location.hash = '#/currency/' + encodeURIComponent(c.id); };
         grid.appendChild(btn);
       });
