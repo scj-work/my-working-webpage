@@ -109,20 +109,23 @@
     /* ===== 小招喵吉祥物 ===== */
 
     /* 右下角固定吉祥物 */
-    .mascot-fixed {
+    .mascot-container {
       position: fixed;
       bottom: 20px;
       right: 20px;
       width: 60px;
       height: 60px;
-      cursor: pointer;
       z-index: 1000;
       animation: mascotSwing 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .mascot-fixed {
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
       filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
       -webkit-tap-highlight-color: transparent;
-    }
-    .mascot-fixed:hover {
-      animation-play-state: paused;
+      pointer-events: auto;
     }
     .mascot-fixed:active {
       opacity: 0.8;
@@ -767,7 +770,9 @@
   </script>
 
   <!-- 右下角小招喵吉祥物 -->
-  <img src="/assets/3.gif" alt="小招喵" class="mascot-fixed" id="mascotFixed">
+  <div class="mascot-container">
+    <img src="/assets/3.gif" alt="小招喵" class="mascot-fixed" id="mascotFixed">
+  </div>
   <div class="mascot-toast" id="mascotToast"></div>
 
 </body>
