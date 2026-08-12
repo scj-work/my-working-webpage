@@ -440,6 +440,13 @@
     }
 
     function router() {
+      // 控制免责声明只在首页显示（放在最前面，避免 return 跳过）
+      const tip = document.getElementById('disclaimerTip');
+      if (tip) {
+        const hash = location.hash || '';
+        const isHome = hash === '' || hash === '#' || hash === '#/';
+        tip.style.display = isHome ? 'block' : 'none';
+      }
       try {
         const parts = getHashParts();
         if (parts.length === 0) {
@@ -465,12 +472,6 @@
         console.error('Routing error:', err);
         showFatal(err.stack || err.message || err);
         try { renderHome(); showBack(false); } catch(e){}
-      }
-      // 控制免责声明只在首页显示
-      const tip = document.getElementById('disclaimerTip');
-      if (tip) {
-        const isHome = location.hash === '' || location.hash === '#' || location.hash === '#/';
-        tip.style.display = isHome ? 'block' : 'none';
       }
       // 触发页面淡入动画
       root.classList.remove('fade-in');
